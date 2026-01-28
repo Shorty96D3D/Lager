@@ -6,236 +6,230 @@
     <title>Lager-Aue Elektro</title>
     <style>
         body { font-family: -apple-system, sans-serif; padding: 10px; background: #121212; color: #e0e0e0; line-height: 1.4; }
-        .card { background: #1e1e1e; padding: 15px; border-radius: 12px; max-width: 600px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
-        h2 { color: #007bff; text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .card { background: #1e1e1e; padding: 15px; border-radius: 12px; max-width: 800px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+        h2 { color: #28a745; text-align: center; margin-bottom: 20px; text-transform: uppercase; }
         .section { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333; }
         h3 { font-size: 14px; margin: 0 0 10px 0; color: #00d4ff; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        
         label { display: block; margin-top: 8px; font-size: 11px; color: #888; text-transform: uppercase; }
-        input, select { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #444; border-radius: 6px; background: #121212; color: white; font-size: 15px; box-sizing: border-box; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        input { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #444; border-radius: 6px; background: #121212; color: white; font-size: 15px; box-sizing: border-box; }
         
-        button { width: 100%; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; margin-top: 10px; cursor: pointer; transition: 0.2s; }
-        .btn-calc { background: #6c757d; color: white; }
-        .btn-order { background: #28a745; color: white; }
-        .btn-add { background: #007bff; font-size: 13px; padding: 8px; }
+        .search-bar { border: 2px solid #007bff; margin-bottom: 15px; font-size: 16px; }
         
-        .inventory-item { background: #2a2a2a; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; font-size: 13px; border-left: 4px solid #007bff; transition: 0.2s; }
+        .grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; }
+        .inventory-item { 
+            background: #2a2a2a; 
+            margin-bottom: 5px; 
+            padding: 10px; 
+            border-radius: 6px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-left: 5px solid #444;
+        }
         
         .low-stock { border-left-color: #ff4444 !important; }
-        .low-stock-text { color: #ff4444 !important; font-weight: bold; }
-
-        .item-info { flex-grow: 1; }
-        .item-actions { display: flex; gap: 8px; align-items: center; }
-        .refill-btn { background-color: #007bff; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .delete-btn { background-color: #ff4444 !important; color: white !important; border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .low-stock .stock-display { color: #ff4444; font-weight: bold; }
         
-        .history-list { margin-top: 10px; max-height: 250px; overflow-y: auto; }
-        .history-item { font-size: 12px; padding: 10px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; margin-bottom: 4px; border-radius: 4px; }
-        .history-date { color: #888; font-size: 10px; }
+        .item-info { flex: 2; }
+        .item-controls { flex: 1; display: flex; gap: 5px; align-items: center; justify-content: flex-end; }
+        .qty-input { width: 60px !important; text-align: center; margin-top: 0; padding: 5px; }
+        
+        button { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-add { background: #28a745; color: white; width: 100%; margin-top: 10px; }
+        .btn-minus { background: #ff4444; color: white; width: 35px; height: 35px; }
+        .btn-plus { background: #007bff; color: white; width: 35px; height: 35px; }
+        .btn-del { background: #444; color: #bbb; font-size: 10px; margin-left: 10px; }
+        
+        .btn-shopping { background: #007bff; color: white; width: 100%; margin-bottom: 15px; font-size: 16px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-shopping:hover { background: #0056b3; }
 
-        .total-box { margin-top: 15px; padding: 15px; background: #121212; border-radius: 8px; text-align: center; border: 1px solid #00d4ff; }
-        .price-tag { font-size: 26px; color: #00d4ff; font-weight: bold; display: block; }
-        .success-msg { color: #28a745; font-size: 12px; margin-top: 5px; font-weight: bold; display: none; }
-        .multi-label { color: #aaa !important; font-size: 10px !important; margin-top: 4px !important; }
+        .summary { display: flex; justify-content: space-between; font-size: 13px; color: #28a745; font-weight: bold; margin-bottom: 10px; }
+
+        /* Modal / Overlay Styles */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: #1e1e1e; margin: 10% auto; padding: 20px; border-radius: 12px; max-width: 500px; border: 1px solid #00d4ff; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; }
+        .close-modal { color: #888; font-size: 24px; cursor: pointer; }
+        .shopping-list-item { padding: 8px; border-bottom: 1px solid #333; font-size: 14px; }
+        .btn-copy { background: #6c757d; color: white; width: 100%; margin-top: 15px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>Lager-Aue Elektro</h2>
 
-        <div class="section">
-            <h3>📦 Lagerbestand & Warenwert</h3>
-            <div id="inventory-list"></div>
-            <div id="warehouse-value" style="font-size: 12px; color: #28a745; margin-top: 10px; text-align: right;">Warenwert: 0,00 €</div>
-            <hr style="border: 0; border-top: 1px solid #444; margin: 15px 0;">
-            <label>Neues Material Name:</label>
-            <input type="text" id="new_name" placeholder="z.B. PLA Schwarz">
-            <div class="grid">
-                <div><label>Preis (€/kg)</label><input type="number" id="new_price" step="0.01" placeholder="25.00"></div>
-                <div><label>Bestand (g)</label><input type="number" id="new_stock" placeholder="1000"></div>
-            </div>
-            <button class="btn-add" onclick="addMaterial()">+ Material hinzufügen</button>
-        </div>
+<div class="card">
+    <h2>📦 Lager-Aue Elektro</h2>
 
-        <div class="section">
-            <h3>🚀 Projekt-Kalkulation</h3>
-            
-            <label>Projektname / Kunde:</label>
-            <input type="text" id="calc_project_name" placeholder="z.B. Huber - Rahmenhalter">
-
-            <label>Material 1 (Haupt):</label>
-            <div class="grid">
-                <select id="mat_0"></select>
-                <input type="number" id="gram_0" placeholder="Gramm">
-            </div>
-
-            <label class="multi-label">Zusatzmaterialien (Multicolor/Support):</label>
-            <div class="grid" style="margin-bottom: 4px;">
-                <select id="mat_1"></select>
-                <input type="number" id="gram_1" placeholder="Gramm">
-            </div>
-            <div class="grid" style="margin-bottom: 4px;">
-                <select id="mat_2"></select>
-                <input type="number" id="gram_2" placeholder="Gramm">
-            </div>
-            <div class="grid">
-                <select id="mat_3"></select>
-                <input type="number" id="gram_3" placeholder="Gramm">
-            </div>
-            
-            <div class="grid">
-                <div><label>Druckzeit (h)</label><input type="number" id="calc_h" placeholder="4"></div>
-                <div><label>Arbeit (min)</label><input type="number" id="calc_min" placeholder="15"></div>
-            </div>
-            <label>Stundenlohn (€/h)</label>
-            <input type="number" id="calc_wage" value="30">
-            
-            <button class="btn-calc" onclick="calculate(false)">Nur Preis berechnen</button>
-            <button class="btn-order" onclick="calculate(true)">Auftrag bestätigen & Abbuchen</button>
-            <div id="order-success" class="success-msg">✅ Auftrag gebucht & Bestände korrigiert!</div>
-        </div>
-
-        <div id="res" class="total-box" style="display:none;">
-            <span style="color: #888; font-size: 12px;">GESAMT-ANGEBOTSPREIS:</span>
-            <span id="total_price" class="price-tag">0,00 €</span>
-        </div>
-
-        <div class="section">
-            <h3>📜 Historie</h3>
-            <div id="history-list" class="history-list">
-                <div style="color: #666; font-size: 12px; text-align: center; padding: 10px;">Noch keine Einträge.</div>
-            </div>
-            <button onclick="clearHistory()" style="background: none; color: #ff4444; font-size: 10px; padding: 5px; margin-top: 10px; width: auto; font-weight: normal;">Historie löschen</button>
-        </div>
+    <div class="summary">
+        <span id="total-items">Artikel: 0</span>
+        <span id="total-value">Gesamtwert: 0,00 €</span>
     </div>
 
-    <script>
-        let inventory = JSON.parse(localStorage.getItem('d3d_inv')) || [];
-        let history = JSON.parse(localStorage.getItem('d3d_history')) || [];
+    <button class="btn-shopping" onclick="openShoppingList()">
+        🛒 Einkaufsliste <span id="low-count-badge" style="background: #ff4444; padding: 2px 8px; border-radius: 10px; font-size: 12px;">0</span>
+    </button>
 
-        function updateUI() {
-            const list = document.getElementById('inventory-list');
-            const selects = [document.getElementById('mat_0'), document.getElementById('mat_1'), document.getElementById('mat_2'), document.getElementById('mat_3')];
-            const histList = document.getElementById('history-list');
-            
-            list.innerHTML = '';
-            selects.forEach(s => s.innerHTML = '<option value="">-- Wählen --</option>');
-            
-            let totalVal = 0;
+    <div class="section">
+        <h3>➕ Neuen Artikel anlegen</h3>
+        <label>Bezeichnung</label>
+        <input type="text" id="name" placeholder="z.B. Steckdose UP">
+        <div class="grid">
+            <div><label>Stückpreis (€)</label><input type="number" id="price" step="0.01" placeholder="2.50"></div>
+            <div><label>Bestand</label><input type="number" id="stock" placeholder="500"></div>
+            <div><label>Warnung bei <</label><input type="number" id="min" placeholder="100"></div>
+        </div>
+        <button class="btn-add" onclick="addItem()">Artikel speichern</button>
+    </div>
 
-            inventory.forEach((item, index) => {
-                const isLow = item.stock < 100;
+    <input type="text" id="search" class="search-bar" placeholder="🔍 Artikel suchen..." onkeyup="renderInventory()">
+
+    <div id="inventory-list"></div>
+</div>
+
+<div id="shoppingModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 style="margin:0; color:#00d4ff;">🛒 Benötigte Artikel</h3>
+            <span class="close-modal" onclick="closeShoppingList()">&times;</span>
+        </div>
+        <div id="shopping-list-content">
+            </div>
+        <button class="btn-copy" onclick="copyShoppingList()">📋 Liste in Zwischenablage kopieren</button>
+    </div>
+</div>
+
+<script>
+    let storage = JSON.parse(localStorage.getItem('universal_storage')) || [];
+
+    function addItem() {
+        const name = document.getElementById('name').value;
+        const price = parseFloat(document.getElementById('price').value) || 0;
+        const stock = parseInt(document.getElementById('stock').value) || 0;
+        const min = parseInt(document.getElementById('min').value) || 0;
+
+        if(name) {
+            storage.push({ name, price, stock, min });
+            document.getElementById('name').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('stock').value = '';
+            document.getElementById('min').value = '';
+            saveAndRender();
+        }
+    }
+
+    function changeStock(index, amount) {
+        storage[index].stock = Math.max(0, storage[index].stock + amount);
+        saveAndRender();
+    }
+
+    function quickDeduct(index) {
+        const input = document.getElementById(`quick-${index}`);
+        const val = parseInt(input.value) || 0;
+        storage[index].stock = Math.max(0, storage[index].stock - val);
+        input.value = '';
+        saveAndRender();
+    }
+
+    function deleteItem(index) {
+        if(confirm("Artikel wirklich löschen?")) {
+            storage.splice(index, 1);
+            saveAndRender();
+        }
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('universal_storage', JSON.stringify(storage));
+        renderInventory();
+    }
+
+    function renderInventory() {
+        const list = document.getElementById('inventory-list');
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        list.innerHTML = '';
+        
+        let totalVal = 0;
+        let count = 0;
+        let lowStockCount = 0;
+
+        storage.forEach((item, index) => {
+            const isLow = item.stock <= item.min;
+            if(isLow) lowStockCount++;
+
+            if(!item.name.toLowerCase().includes(searchTerm)) return;
+
+            totalVal += (item.stock * item.price);
+            count++;
+
+            const div = document.createElement('div');
+            div.className = 'inventory-item' + (isLow ? ' low-stock' : '');
+            
+            div.innerHTML = `
+                <div class="item-info">
+                    <strong>${item.name}</strong><br>
+                    <span style="font-size: 11px; color: #888;">Einzel: ${item.price.toFixed(2)}€ | Gesamt: ${(item.stock * item.price).toFixed(2)}€</span><br>
+                    <span class="stock-display">Bestand: ${item.stock} Stück</span> 
+                    ${isLow ? '<span style="color:#ff4444; font-size:10px;">⚠️ NACHBESTELLEN!</span>' : ''}
+                </div>
+                <div class="item-controls">
+                    <input type="number" id="quick-${index}" class="qty-input" placeholder="Anz.">
+                    <button class="btn-minus" onclick="quickDeduct(${index})" title="Abziehen">-</button>
+                    <button class="btn-plus" onclick="changeStock(${index}, 10)" title="Plus 10">+10</button>
+                    <button class="btn-del" onclick="deleteItem(${index})">🗑️</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+
+        document.getElementById('total-items').innerText = `Artikel: ${count}`;
+        document.getElementById('total-value').innerText = `Gesamtwert: ${totalVal.toLocaleString('de-DE', {style:'currency', currency:'EUR'})}`;
+        document.getElementById('low-count-badge').innerText = lowStockCount;
+    }
+
+    function openShoppingList() {
+        const modal = document.getElementById('shoppingModal');
+        const content = document.getElementById('shopping-list-content');
+        content.innerHTML = '';
+        
+        const lowStockItems = storage.filter(item => item.stock <= item.min);
+        
+        if(lowStockItems.length === 0) {
+            content.innerHTML = '<p style="text-align:center; color:#888;">Alles bestens! Keine Artikel unter Mindestbestand.</p>';
+        } else {
+            lowStockItems.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'inventory-item' + (isLow ? ' low-stock' : '');
-                
-                div.innerHTML = `
-                    <div class="item-info">
-                        <strong class="${isLow ? 'low-stock-text' : ''}">${item.name}</strong> 
-                        ${isLow ? '<span class="low-stock-text">⚠️!</span>' : ''}<br>
-                        <span class="${isLow ? 'low-stock-text' : ''}">${item.stock}g (${item.price}€/kg)</span>
-                    </div>
-                    <div class="item-actions">
-                        <button class="refill-btn" onclick="refillItem(${index})">+</button>
-                        <button class="delete-btn" onclick="deleteItem(${index})">X</button>
-                    </div>`;
-                list.appendChild(div);
-
-                selects.forEach(s => s.options.add(new Option(`${item.name} (${item.stock}g)`, index)));
-                totalVal += (item.stock / 1000) * item.price;
+                div.className = 'shopping-list-item';
+                div.innerHTML = `<strong>${item.name}</strong><br>Stand: ${item.stock} (Mindestens: ${item.min})`;
+                content.appendChild(div);
             });
-
-            if (history.length > 0) {
-                histList.innerHTML = '';
-                history.slice().reverse().forEach(entry => {
-                    const hDiv = document.createElement('div');
-                    hDiv.className = 'history-item';
-                    hDiv.innerHTML = `<div><strong>${entry.project || 'Unbenanntes Projekt'}</strong><br><span style="font-size:10px; color:#aaa">${entry.mat}</span><br><span class="history-date">${entry.date}</span></div>
-                                      <div style="color: #00d4ff; font-weight: bold;">${entry.price}</div>`;
-                    histList.appendChild(hDiv);
-                });
-            }
-
-            document.getElementById('warehouse-value').innerText = `Warenwert Lager: ${totalVal.toFixed(2)} €`;
-            localStorage.setItem('d3d_inv', JSON.stringify(inventory));
-            localStorage.setItem('d3d_history', JSON.stringify(history));
         }
+        modal.style.display = "block";
+    }
 
-        function addMaterial() {
-            const name = document.getElementById('new_name').value;
-            const price = parseFloat(document.getElementById('new_price').value);
-            const stock = parseFloat(document.getElementById('new_stock').value);
-            if(name && !isNaN(price)) {
-                inventory.push({name, price, stock: stock || 0});
-                document.getElementById('new_name').value = '';
-                document.getElementById('new_price').value = '';
-                document.getElementById('new_stock').value = '';
-                updateUI();
-            }
-        }
+    function closeShoppingList() {
+        document.getElementById('shoppingModal').style.display = "none";
+    }
 
-        function refillItem(index) {
-            const amount = prompt(`Menge für ${inventory[index].name} (g):`, "1000");
-            if (amount) { inventory[index].stock += parseFloat(amount); updateUI(); }
-        }
+    function copyShoppingList() {
+        const lowStockItems = storage.filter(item => item.stock <= item.min);
+        if(lowStockItems.length === 0) return alert("Nichts zu kopieren!");
 
-        function deleteItem(index) {
-            if(confirm("Material löschen?")) { inventory.splice(index, 1); updateUI(); }
-        }
+        let text = "🛒 EINKAUFSLISTE LAGER-AUE ELEKTRO:\n\n";
+        lowStockItems.forEach(item => {
+            text += `- ${item.name} (Aktuell: ${item.stock} Stk., Min-Soll: ${item.min} Stk.)\n`;
+        });
 
-        function calculate(doDeduct) {
-            let matCosts = 0;
-            let usedMatsInfo = [];
-            let deductionList = [];
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Liste wurde in die Zwischenablage kopiert!");
+        });
+    }
 
-            for(let i=0; i<4; i++) {
-                const idx = document.getElementById(`mat_${i}`).value;
-                const gram = parseFloat(document.getElementById(`gram_${i}`).value) || 0;
-                if(idx !== "" && gram > 0) {
-                    const mat = inventory[idx];
-                    matCosts += (gram / 1000) * mat.price;
-                    usedMatsInfo.push(`${mat.name} (${gram}g)`);
-                    deductionList.push({index: idx, amount: gram});
-                }
-            }
+    window.onclick = function(event) {
+        const modal = document.getElementById('shoppingModal');
+        if (event.target == modal) closeShoppingList();
+    }
 
-            if(usedMatsInfo.length === 0) return alert("Mindestens 1 Material wählen!");
+    window.onload = renderInventory;
+</script>
 
-            const h = parseFloat(document.getElementById('calc_h').value) || 0;
-            const min = parseFloat(document.getElementById('calc_min').value) || 0;
-            const wage = parseFloat(document.getElementById('calc_wage').value) || 30;
-            const project = document.getElementById('calc_project_name').value;
-
-            let energy = h * 0.15 * 0.40; 
-            let wear = h * 0.60; 
-            let labor = (min / 60) * wage;
-            let total = (matCosts + energy + wear + labor) * 1.15;
-
-            const formattedPrice = total.toLocaleString('de-DE', {style:'currency', currency:'EUR'});
-            document.getElementById('total_price').innerText = formattedPrice;
-            document.getElementById('res').style.display = 'block';
-
-            if(doDeduct) {
-                deductionList.forEach(item => {
-                    inventory[item.index].stock = Math.max(0, inventory[item.index].stock - item.amount);
-                });
-                
-                const now = new Date();
-                history.push({
-                    project: project,
-                    mat: usedMatsInfo.join(", "),
-                    price: formattedPrice,
-                    date: now.toLocaleString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'})
-                });
-                
-                if(history.length > 25) history.shift();
-                updateUI();
-                document.getElementById('order-success').style.display = 'block';
-                setTimeout(() => { document.getElementById('order-success').style.display = 'none'; }, 3000);
-            }
-        }
-
-        function clearHistory() { if(confirm("Historie leeren?")) { history = []; updateUI(); } }
-        window.onload = updateUI;
-    </script>
 </body>
 </html>
