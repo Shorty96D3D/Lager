@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lager-Manager Pro</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; padding: 10px; background: #121212; color: #e0e0e0; line-height: 1.4; }
+        .card { background: #1e1e1e; padding: 15px; border-radius: 12px; max-width: 800px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+        h2 { color: #28a745; text-align: center; margin-bottom: 20px; text-transform: uppercase; }
+        .section { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333; }
+        h3 { font-size: 14px; margin: 0 0 10px 0; color: #00d4ff; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        
+        label { display: block; margin-top: 8px; font-size: 11px; color: #888; text-transform: uppercase; }
+        input { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #444; border-radius: 6px; background: #121212; color: white; font-size: 15px; box-sizing: border-box; }
+        
+        .search-bar { border: 2px solid #007bff; margin-bottom: 15px; font-size: 16px; }
+        
+        .grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; }
+        .inventory-item { 
+            background: #2a2a2a; 
+            margin-bottom: 5px; 
+            padding: 10px; 
+            border-radius: 6px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-left: 5px solid #444;
+        }
+        
+        .low-stock { border-left-color: #ff4444 !important; }
+        .low-stock .stock-display { color: #ff4444; font-weight: bold; }
+        
+        .item-info { flex: 2; }
+        .item-controls { flex: 1; display: flex; gap: 5px; align-items: center; justify-content: flex-end; }
+        .qty-input { width: 60px !important; text-align: center; margin-top: 0; padding: 5px; }
+        
+        button { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-add { background: #28a745; color: white; width: 100%; margin-top: 10px; }
+        .btn-minus { background: #ff4444; color: white; width: 35px; height: 35px; }
+        .btn-plus { background: #007bff; color: white; width: 35px; height: 35px; }
+        .btn-del { background: #444; color: #bbb; font-size: 10px; margin-left: 10px; }
+        
+        .btn-shopping { background: #007bff; color: white; width: 100%; margin-bottom: 15px; font-size: 16px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-shopping:hover { background: #0056b3; }
+
+        .summary { display: flex; justify-content: space-between; font-size: 13px; color: #28a745; font-weight: bold; margin-bottom: 10px; }
+
+        /* Modal / Overlay Styles */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: #1e1e1e; margin: 10% auto; padding: 20px; border-radius: 12px; max-width: 500px; border: 1px solid #00d4ff; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; }
+        .close-modal { color: #888; font-size: 24px; cursor: pointer; }
+        .shopping-list-item { padding: 8px; border-bottom: 1px solid #333; font-size: 14px; }
+        .btn-copy { background: #6c757d; color: white; width: 100%; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>📦 Lager-Manager Pro</h2>
+
+    <div class="summary">
+        <span id="total-items">Artikel: 0</span>
+        <span id="total-value">Gesamtwert: 0,00 €</span>
+    </div>
+
+    <button class="btn-shopping" onclick="openShoppingList()">
+        🛒 Einkaufsliste <span id="low-count-badge" style="background: #ff4444; padding: 2px 8px; border-radius: 10px; font-size: 12px;">0</span>
+    </button>
+
+    <div class="section">
+        <h3>➕ Neuen Artikel anlegen</h3>
+        <label>Bezeichnung</label>
+        <input type="text" id="name" placeholder="z.B. Steckdose UP">
+        <div class="grid">
+            <div><label>Stückpreis (€)</label><input type="number" id="price" step="0.01" placeholder="2.50"></div>
+            <div><label>Bestand</label><input type="number" id="stock" placeholder="500"></div>
+            <div><label>Warnung bei <</label><input type="number" id="min" placeholder="100"></div>
+        </div>
+        <button class="btn-add" onclick="addItem()">Artikel speichern</button>
+    </div>
+
+    <input type="text" id="search" class="search-bar" placeholder="🔍 Artikel suchen..." onkeyup="renderInventory()">
+
+    <div id="inventory-list"></div>
+</div>
+
+<div id="shoppingModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 style="margin:0; color:#00d4ff;">🛒 Benötigte Artikel</h3>
+            <span class="close-modal" onclick="closeShoppingList()">&times;</span>
+        </div>
+        <div id="shopping-list-content">
+            </div>
+        <button class="btn-copy" onclick="copyShoppingList()">📋 Liste in Zwischenablage kopieren</button>
+    </div>
+</div>
+
+<script>
+    let storage = JSON.parse(localStorage.getItem('universal_storage')) || [];
+
+    function addItem() {
+        const name = document.getElementById('name').value;
+        const price = parseFloat(document.getElementById('price').value) || 0;
+        const stock = parseInt(document.getElementById('stock').value) || 0;
+        const min = parseInt(document.getElementById('min').value) || 0;
+
+        if(name) {
+            storage.push({ name, price, stock, min });
+            document.getElementById('name').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('stock').value = '';
+            document.getElementById('min').value = '';
+            saveAndRender();
+        }
+    }
+
+    function changeStock(index, amount) {
+        storage[index].stock = Math.max(0, storage[index].stock + amount);
+        saveAndRender();
+    }
+
+    function quickDeduct(index) {
+        const input = document.getElementById(`quick-${index}`);
+        const val = parseInt(input.value) || 0;
+        storage[index].stock = Math.max(0, storage[index].stock - val);
+        input.value = '';
+        saveAndRender();
+    }
+
+    function deleteItem(index) {
+        if(confirm("Artikel wirklich löschen?")) {
+            storage.splice(index, 1);
+            saveAndRender();
+        }
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('universal_storage', JSON.stringify(storage));
+        renderInventory();
+    }
+
+    function renderInventory() {
+        const list = document.getElementById('inventory-list');
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        list.innerHTML = '';
+        
+        let totalVal = 0;
+        let count = 0;
+        let lowStockCount = 0;
+
+        storage.forEach((item, index) => {
+            const isLow = item.stock <= item.min;
+            if(isLow) lowStockCount++;
+
+            if(!item.name.toLowerCase().includes(searchTerm)) return;
+
+            totalVal += (item.stock * item.price);
+            count++;
+
+            const div = document.createElement('div');
+            div.className = 'inventory-item' + (isLow ? ' low-stock' : '');
+            
+            div.innerHTML = `
+                <div class="item-info">
+                    <strong>${item.name}</strong><br>
+                    <span style="font-size: 11px; color: #888;">Einzel: ${item.price.toFixed(2)}€ | Gesamt: ${(item.stock * item.price).toFixed(2)}€</span><br>
+                    <span class="stock-display">Bestand: ${item.stock} Stück</span> 
+                    ${isLow ? '<span style="color:#ff4444; font-size:10px;">⚠️ NACHBESTELLEN!</span>' : ''}
+                </div>
+                <div class="item-controls">
+                    <input type="number" id="quick-${index}" class="qty-input" placeholder="Anz.">
+                    <button class="btn-minus" onclick="quickDeduct(${index})" title="Abziehen">-</button>
+                    <button class="btn-plus" onclick="changeStock(${index}, 10)" title="Plus 10">+10</button>
+                    <button class="btn-del" onclick="deleteItem(${index})">🗑️</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+
+        document.getElementById('total-items').innerText = `Artikel: ${count}`;
+        document.getElementById('total-value').innerText = `Gesamtwert: ${totalVal.toLocaleString('de-DE', {style:'currency', currency:'EUR'})}`;
+        document.getElementById('low-count-badge').innerText = lowStockCount;
+    }
+
+    // Modal Funktionen
+    function openShoppingList() {
+        const modal = document.getElementById('shoppingModal');
+        const content = document.getElementById('shopping-list-content');
+        content.innerHTML = '';
+        
+        const lowStockItems = storage.filter(item => item.stock <= item.min);
+        
+        if(lowStockItems.length === 0) {
+            content.innerHTML = '<p style="text-align:center; color:#888;">Alles bestens! Keine Artikel unter Mindestbestand.</p>';
+        } else {
+            lowStockItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'shopping-list-item';
+                div.innerHTML = `<strong>${item.name}</strong><br>Stand: ${item.stock} (Mindestens: ${item.min})`;
+                content.appendChild(div);
+            });
+        }
+        modal.style.display = "block";
+    }
+
+    function closeShoppingList() {
+        document.getElementById('shoppingModal').style.display = "none";
+    }
+
+    function copyShoppingList() {
+        const lowStockItems = storage.filter(item => item.stock <= item.min);
+        if(lowStockItems.length === 0) return alert("Nichts zu kopieren!");
+
+        let text = "🛒 EINKAUFSLISTE LAGER:\n\n";
+        lowStockItems.forEach(item => {
+            text += `- ${item.name} (Aktuell: ${item.stock} Stk., Min-Soll: ${item.min} Stk.)\n`;
+        });
+
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Liste wurde in die Zwischenablage kopiert!");
+        });
+    }
+
+    // Schließen wenn man außerhalb klickt
+    window.onclick = function(event) {
+        const modal = document.getElementById('shoppingModal');
+        if (event.target == modal) closeShoppingList();
+    }
+
+    window.onload = renderInventory;
+</script>
+
+</body>
+</html>
