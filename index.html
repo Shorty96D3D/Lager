@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lager-Aue Elektro</title>
+    <title>📦 Lager-Aue Elektro</title>
     <style>
         body { font-family: -apple-system, sans-serif; padding: 10px; background: #121212; color: #e0e0e0; line-height: 1.4; }
         .card { background: #1e1e1e; padding: 15px; border-radius: 12px; max-width: 800px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
@@ -185,6 +185,7 @@
         document.getElementById('low-count-badge').innerText = lowStockCount;
     }
 
+    // Modal Funktionen
     function openShoppingList() {
         const modal = document.getElementById('shoppingModal');
         const content = document.getElementById('shopping-list-content');
@@ -213,7 +214,7 @@
         const lowStockItems = storage.filter(item => item.stock <= item.min);
         if(lowStockItems.length === 0) return alert("Nichts zu kopieren!");
 
-        let text = "🛒 EINKAUFSLISTE LAGER-AUE ELEKTRO:\n\n";
+        let text = "🛒 EINKAUFSLISTE LAGER:\n\n";
         lowStockItems.forEach(item => {
             text += `- ${item.name} (Aktuell: ${item.stock} Stk., Min-Soll: ${item.min} Stk.)\n`;
         });
@@ -223,6 +224,7 @@
         });
     }
 
+    // Schließen wenn man außerhalb klickt
     window.onclick = function(event) {
         const modal = document.getElementById('shoppingModal');
         if (event.target == modal) closeShoppingList();
