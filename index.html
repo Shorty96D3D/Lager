@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lager-Manager Pro | Enterprise v4</title>
+    <title>Lager-Manager Pro | Enterprise v4.1</title>
     <style>
         :root {
             --accent-purple: #a29bfe;
@@ -75,7 +75,6 @@
             font-size: 18px;
         }
 
-        /* ACTIONS */
         .action-group { display: flex; gap: 8px; margin-top: 10px; width: 100%; justify-content: flex-end; }
         .btn {
             padding: 10px 16px; border: none; border-radius: 10px; cursor: pointer;
@@ -104,7 +103,6 @@
         .history-item { padding: 5px 0; border-bottom: 1px solid #222; }
 
         .warn-tag { color: var(--danger); font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        
         .nav-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
     </style>
 </head>
@@ -132,6 +130,7 @@
         <select id="inLoc"></select>
         <button class="btn btn-primary" style="width:100%" onclick="saveItem()">Speichern</button>
         <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeModals()">Abbrechen</button>
+        <button id="delBtn" class="btn btn-outline" style="width:100%; margin-top:10px; color:var(--danger); border-color:var(--danger); display:none;" onclick="deleteItem()">Löschen</button>
     </div>
 </div>
 
@@ -140,220 +139,7 @@
         <h3>📦 Umlagern</h3>
         <p id="transferItemName" style="color: var(--accent-purple); font-weight: bold;"></p>
         <label>Menge</label>
-        <input type="number" id="transQty">
+        <input type="number" id="transQty" value="1">
         <label>Ziel-Lager</label>
         <select id="transTarget"></select>
-        <button class="btn btn-transfer" style="width:100%" onclick="executeTransfer()">Verschieben</button>
-        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeModals()">Abbrechen</button>
-    </div>
-</div>
-
-<div id="modalCopy" class="overlay">
-    <div class="modal">
-        <h3>📋 Standort-Profil kopieren</h3>
-        <p style="font-size: 13px; color: var(--text-dim);">Überträgt alle Artikelnamen und deren <b>Mindestbestände</b> von einem Lager auf ein anderes.</p>
-        
-        <label>Kopieren von (Quelle):</label>
-        <select id="copySource"></select>
-        
-        <label>Übertragen nach (Ziel):</label>
-        <select id="copyTarget"></select>
-        
-        <div style="background: rgba(162, 155, 254, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--accent-purple);">
-            <small style="color: var(--accent-purple);">⚠️ Existierende Artikel im Ziel werden aktualisiert. Neue Artikel werden mit Bestand 0 angelegt.</small>
-        </div>
-
-        <button class="btn btn-primary" style="width:100%" onclick="executeProfileCopy()">Profil jetzt übertragen</button>
-        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeModals()">Abbrechen</button>
-    </div>
-</div>
-
-<script>
-    let locations = JSON.parse(localStorage.getItem('L_LOCS')) || ["Hauptlager", "Auto Domi", "Garage", "Anhänger"];
-    let inventory = JSON.parse(localStorage.getItem('L_INV')) || [];
-    let history = JSON.parse(localStorage.getItem('L_HIST')) || [];
-
-    let currentView = 'dashboard'; 
-    let activeLoc = null;
-    let transferSourceIdx = null;
-
-    function save() {
-        localStorage.setItem('L_LOCS', JSON.stringify(locations));
-        localStorage.setItem('L_INV', JSON.stringify(inventory));
-        localStorage.setItem('L_HIST', JSON.stringify(history));
-    }
-
-    function logAction(msg) {
-        history.unshift(`${new Date().toLocaleString('de-DE')}: ${msg}`);
-        if(history.length > 50) history.pop();
-        save();
-    }
-
-    function render() {
-        const root = document.getElementById('app-root');
-        const term = document.getElementById('globalSearch').value.toLowerCase();
-        root.innerHTML = '';
-
-        if(term) { renderSearch(root, term); } 
-        else if(currentView === 'dashboard') { renderDashboard(root); } 
-        else { renderLocationView(root); }
-    }
-
-    function renderDashboard(container) {
-        container.innerHTML = `
-            <div class="nav-buttons">
-                <button class="btn btn-primary" onclick="openItemModal(null, locations[0])">+ Global Neu</button>
-                <button class="btn btn-outline" onclick="openCopyModal()">📋 Profile kopieren</button>
-            </div>
-            <h2>Lager-Übersicht</h2>`;
-        
-        const grid = document.createElement('div');
-        grid.className = 'dashboard-grid';
-
-        locations.forEach(loc => {
-            const items = inventory.filter(i => i.location === loc);
-            const low = items.filter(i => i.stock <= i.min && i.min > 0).length;
-            grid.innerHTML += `
-                <div class="location-card" onclick="viewLoc('${loc}')">
-                    <div>
-                        <h3>${loc}</h3>
-                        <div class="stats">${items.length} Typen | ${items.reduce((a,b)=>a+b.stock,0)} Stk.</div>
-                    </div>
-                    ${low > 0 ? `<div class="warn-tag">⚠️ ${low} auffüllen</div>` : ''}
-                </div>`;
-        });
-        container.appendChild(grid);
-        renderHistory(container);
-    }
-
-    function renderLocationView(container) {
-        container.innerHTML = `
-            <div style="cursor:pointer; color:var(--accent-purple); margin-bottom:20px;" onclick="currentView='dashboard'; render();">← Zurück</div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>${activeLoc}</h2>
-                <button class="btn btn-primary" onclick="openItemModal(null, '${activeLoc}')">+ Neu</button>
-            </div><br>`;
-        inventory.filter(i => i.location === activeLoc).forEach(item => container.appendChild(createItemCard(item)));
-    }
-
-    function renderSearch(container, term) {
-        container.innerHTML = `<h2>Suche: "${term}"</h2><br>`;
-        inventory.filter(i => i.name.toLowerCase().includes(term) || (term === 'leer' && i.stock <= i.min))
-                 .forEach(item => container.appendChild(createItemCard(item)));
-    }
-
-    function createItemCard(item) {
-        const idx = inventory.indexOf(item);
-        const isLow = item.stock <= item.min && item.min > 0;
-        const div = document.createElement('div');
-        div.className = 'item-row' + (isLow ? ' is-low' : '');
-        div.innerHTML = `
-            <div class="item-info">
-                <small>${item.location}</small>
-                <b>${item.name}</b>
-                <span class="min-info">Soll: ${item.min}</span>
-            </div>
-            <div class="stock-badge">${item.stock}</div>
-            <div class="action-group">
-                <button class="btn btn-outline" onclick="changeStock(${idx}, 1)">+</button>
-                <button class="btn btn-outline" onclick="changeStock(${idx}, -1)">-</button>
-                <button class="btn btn-transfer" onclick="openTransfer(${idx})">📦</button>
-                <button class="btn btn-outline" onclick="openItemModal(${idx}, '${item.location}')">⚙️</button>
-            </div>`;
-        return div;
-    }
-
-    function openCopyModal() {
-        const src = document.getElementById('copySource');
-        const target = document.getElementById('copyTarget');
-        const opts = locations.map(l => `<option value="${l}">${l}</option>`).join('');
-        src.innerHTML = opts; target.innerHTML = opts;
-        document.getElementById('modalCopy').style.display = 'block';
-    }
-
-    function executeProfileCopy() {
-        const src = document.getElementById('copySource').value;
-        const target = document.getElementById('copyTarget').value;
-        if(src === target) return alert("Quelle und Ziel müssen unterschiedlich sein!");
-
-        const sourceItems = inventory.filter(i => i.location === src);
-        sourceItems.forEach(sItem => {
-            let tItem = inventory.find(i => i.name === sItem.name && i.location === target);
-            if(tItem) {
-                tItem.min = sItem.min; // Mindestbestand aktualisieren
-            } else {
-                inventory.push({ name: sItem.name, stock: 0, min: sItem.min, location: target });
-            }
-        });
-
-        logAction(`PROFIL KOPIERT: Von ${src} nach ${target}`);
-        closeModals();
-        render();
-    }
-
-    // Standard Funktionen
-    function viewLoc(loc) { activeLoc = loc; currentView = 'location'; render(); }
-    function changeStock(idx, amt) { inventory[idx].stock = Math.max(0, inventory[idx].stock + amt); save(); render(); }
-    function closeModals() { document.querySelectorAll('.overlay').forEach(o => o.style.display='none'); }
-    
-    function openItemModal(idx, loc) {
-        document.getElementById('editIdx').value = idx !== null ? idx : "";
-        const s = document.getElementById('inLoc');
-        s.innerHTML = locations.map(l => `<option value="${l}" ${l===loc?'selected':''}>${l}</option>`).join('');
-        if(idx !== null) {
-            const i = inventory[idx];
-            document.getElementById('inName').value = i.name;
-            document.getElementById('inStock').value = i.stock;
-            document.getElementById('inMin').value = i.min;
-        } else {
-            document.getElementById('inName').value = ""; document.getElementById('inStock').value = ""; document.getElementById('inMin').value = 0;
-        }
-        document.getElementById('modalItem').style.display = 'block';
-    }
-
-    function saveItem() {
-        const idx = document.getElementById('editIdx').value;
-        const data = { 
-            name: document.getElementById('inName').value, 
-            stock: parseInt(document.getElementById('inStock').value)||0, 
-            min: parseInt(document.getElementById('inMin').value)||0, 
-            location: document.getElementById('inLoc').value 
-        };
-        if(idx !== "") inventory[idx] = data; else inventory.push(data);
-        logAction(`GESPEICHERT: ${data.name} (${data.location})`);
-        closeModals(); render();
-    }
-
-    function openTransfer(idx) {
-        transferSourceIdx = idx;
-        const i = inventory[idx];
-        document.getElementById('transferItemName').innerText = `${i.name} (${i.location})`;
-        document.getElementById('transTarget').innerHTML = locations.filter(l => l !== i.location).map(l => `<option value="${l}">${l}</option>`).join('');
-        document.getElementById('modalTransfer').style.display = 'block';
-    }
-
-    function executeTransfer() {
-        const qty = parseInt(document.getElementById('transQty').value);
-        const target = document.getElementById('transTarget').value;
-        const source = inventory[transferSourceIdx];
-        if(!qty || qty > source.stock) return alert("Menge ungültig!");
-
-        source.stock -= qty;
-        let tItem = inventory.find(i => i.name === source.name && i.location === target);
-        if(tItem) tItem.stock += qty; else inventory.push({name: source.name, stock: qty, min: 0, location: target});
-        
-        logAction(`TRANSFER: ${qty}x ${source.name} von ${source.location} nach ${target}`);
-        closeModals(); render();
-    }
-
-    function renderHistory(c) {
-        const h = document.createElement('div');
-        h.style.marginTop = "30px";
-        h.innerHTML = `<h3>Logbuch</h3><div class="history-list">${history.map(x => `<div class="history-item">${x}</div>`).join('')}</div>`;
-        c.appendChild(h);
-    }
-
-    window.onload = render;
-</script>
-</body>
-</html>
+        <button class="btn btn-transfer" style="width:10
