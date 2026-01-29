@@ -3,235 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>📦 Lager-Aue Elektro</title>
+    <title>Lager-Manager Pro | Enterprise v4</title>
     <style>
-        body { font-family: -apple-system, sans-serif; padding: 10px; background: #121212; color: #e0e0e0; line-height: 1.4; }
-        .card { background: #1e1e1e; padding: 15px; border-radius: 12px; max-width: 800px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
-        h2 { color: #28a745; text-align: center; margin-bottom: 20px; text-transform: uppercase; }
-        .section { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333; }
-        h3 { font-size: 14px; margin: 0 0 10px 0; color: #00d4ff; border-bottom: 1px solid #444; padding-bottom: 5px; }
-        
-        label { display: block; margin-top: 8px; font-size: 11px; color: #888; text-transform: uppercase; }
-        input { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #444; border-radius: 6px; background: #121212; color: white; font-size: 15px; box-sizing: border-box; }
-        
-        .search-bar { border: 2px solid #007bff; margin-bottom: 15px; font-size: 16px; }
-        
-        .grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; }
-        .inventory-item { 
-            background: #2a2a2a; 
-            margin-bottom: 5px; 
-            padding: 10px; 
-            border-radius: 6px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            border-left: 5px solid #444;
+        :root {
+            --accent-purple: #a29bfe;
+            --accent-yellow: #ffeaa7;
+            --bg-dark: #0f0f12;
+            --card-bg: #1e1e26;
+            --text-main: #f0f0f0;
+            --text-dim: #8e8e93;
+            --danger: #ff7675;
+            --success: #55efc4;
         }
-        
-        .low-stock { border-left-color: #ff4444 !important; }
-        .low-stock .stock-display { color: #ff4444; font-weight: bold; }
-        
-        .item-info { flex: 2; }
-        .item-controls { flex: 1; display: flex; gap: 5px; align-items: center; justify-content: flex-end; }
-        .qty-input { width: 60px !important; text-align: center; margin-top: 0; padding: 5px; }
-        
-        button { padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-add { background: #28a745; color: white; width: 100%; margin-top: 10px; }
-        .btn-minus { background: #ff4444; color: white; width: 35px; height: 35px; }
-        .btn-plus { background: #007bff; color: white; width: 35px; height: 35px; }
-        .btn-del { background: #444; color: #bbb; font-size: 10px; margin-left: 10px; }
-        
-        .btn-shopping { background: #007bff; color: white; width: 100%; margin-bottom: 15px; font-size: 16px; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .btn-shopping:hover { background: #0056b3; }
 
-        .summary { display: flex; justify-content: space-between; font-size: 13px; color: #28a745; font-weight: bold; margin-bottom: 10px; }
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            padding: 0; margin: 0; 
+            background: var(--bg-dark); 
+            color: var(--text-main); 
+            padding-bottom: 50px;
+        }
 
-        /* Modal / Overlay Styles */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: #1e1e1e; margin: 10% auto; padding: 20px; border-radius: 12px; max-width: 500px; border: 1px solid #00d4ff; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; }
-        .close-modal { color: #888; font-size: 24px; cursor: pointer; }
-        .shopping-list-item { padding: 8px; border-bottom: 1px solid #333; font-size: 14px; }
-        .btn-copy { background: #6c757d; color: white; width: 100%; margin-top: 15px; }
+        header {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 2px solid var(--accent-purple);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .search-container { max-width: 800px; margin: auto; }
+        .search-bar {
+            width: 100%; padding: 14px 20px; border-radius: 12px;
+            border: 1px solid #333; background: #2d2d3a; color: white;
+            font-size: 16px; outline: none; transition: 0.3s; box-sizing: border-box;
+        }
+        .search-bar:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(162, 155, 254, 0.2); }
+
+        .container { max-width: 900px; margin: 25px auto; padding: 0 15px; }
+
+        /* DASHBOARD */
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
+        }
+
+        .location-card {
+            background: var(--card-bg); padding: 25px; border-radius: 20px;
+            border: 1px solid #333; cursor: pointer; transition: 0.3s;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .location-card:hover { transform: translateY(-5px); border-color: var(--accent-purple); background: #252530; }
+        .location-card h3 { margin: 0; color: var(--accent-yellow); font-size: 20px; }
+        .location-card .stats { font-size: 13px; color: var(--text-dim); margin-top: 10px; }
+
+        /* ITEM ROWS */
+        .item-row {
+            background: var(--card-bg); margin-bottom: 12px; padding: 18px;
+            border-radius: 15px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+            border-left: 5px solid var(--accent-purple);
+        }
+        .item-row.is-low { border-left-color: var(--danger); background: #2a1b1b; }
+
+        .item-info { flex: 1; min-width: 200px; }
+        .item-info b { font-size: 17px; display: block; color: var(--accent-yellow); }
+        .item-info small { color: var(--text-dim); font-size: 12px; }
+        .min-info { font-size: 11px; color: var(--accent-purple); font-weight: bold; background: rgba(162, 155, 254, 0.1); padding: 2px 6px; border-radius: 4px; }
+        
+        .stock-badge { 
+            background: #2d2d3a; padding: 8px 15px; border-radius: 10px; 
+            font-weight: bold; border: 1px solid #444; min-width: 60px; text-align: center;
+            font-size: 18px;
+        }
+
+        /* ACTIONS */
+        .action-group { display: flex; gap: 8px; margin-top: 10px; width: 100%; justify-content: flex-end; }
+        .btn {
+            padding: 10px 16px; border: none; border-radius: 10px; cursor: pointer;
+            font-weight: bold; transition: 0.2s; font-size: 13px;
+        }
+        .btn-primary { background: var(--accent-purple); color: #121212; }
+        .btn-outline { background: transparent; border: 1px solid var(--accent-purple); color: var(--accent-purple); }
+        .btn-transfer { background: var(--accent-yellow); color: #121212; }
+
+        /* OVERLAYS */
+        .overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 2000; padding: 20px; overflow-y: auto;
+        }
+        .modal {
+            background: var(--card-bg); max-width: 450px; margin: 40px auto;
+            padding: 30px; border-radius: 20px; border: 1px solid var(--accent-purple);
+        }
+
+        input, select {
+            width: 100%; padding: 12px; margin: 10px 0 20px 0;
+            background: #121212; border: 1px solid #444; border-radius: 10px; color: white; box-sizing: border-box;
+        }
+
+        .history-list { font-size: 12px; color: var(--text-dim); max-height: 200px; overflow-y: auto; background: #121212; padding: 10px; border-radius: 10px; }
+        .history-item { padding: 5px 0; border-bottom: 1px solid #222; }
+
+        .warn-tag { color: var(--danger); font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        
+        .nav-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>📦 Lager-Aue Elektro</h2>
-
-    <div class="summary">
-        <span id="total-items">Artikel: 0</span>
-        <span id="total-value">Gesamtwert: 0,00 €</span>
+<header>
+    <div class="search-container">
+        <input type="text" id="globalSearch" class="search-bar" placeholder="🔍 Suchen (z.B. Artikelname oder 'leer')..." onkeyup="render()">
     </div>
+</header>
 
-    <button class="btn-shopping" onclick="openShoppingList()">
-        🛒 Einkaufsliste <span id="low-count-badge" style="background: #ff4444; padding: 2px 8px; border-radius: 10px; font-size: 12px;">0</span>
-    </button>
+<div class="container" id="app-root"></div>
 
-    <div class="section">
-        <h3>➕ Neuen Artikel anlegen</h3>
-        <label>Bezeichnung</label>
-        <input type="text" id="name" placeholder="z.B. Steckdose UP">
-        <div class="grid">
-            <div><label>Stückpreis (€)</label><input type="number" id="price" step="0.01" placeholder="2.50"></div>
-            <div><label>Bestand</label><input type="number" id="stock" placeholder="500"></div>
-            <div><label>Warnung bei <</label><input type="number" id="min" placeholder="100"></div>
+<div id="modalItem" class="overlay">
+    <div class="modal">
+        <h3 id="modalTitle">Artikel bearbeiten</h3>
+        <input type="hidden" id="editIdx">
+        <label>Artikelbezeichnung</label>
+        <input type="text" id="inName">
+        <div style="display:flex; gap:10px;">
+            <div><label>Menge</label><input type="number" id="inStock"></div>
+            <div><label>Min-Soll</label><input type="number" id="inMin"></div>
         </div>
-        <button class="btn-add" onclick="addItem()">Artikel speichern</button>
+        <label>Lagerort</label>
+        <select id="inLoc"></select>
+        <button class="btn btn-primary" style="width:100%" onclick="saveItem()">Speichern</button>
+        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeModals()">Abbrechen</button>
     </div>
-
-    <input type="text" id="search" class="search-bar" placeholder="🔍 Artikel suchen..." onkeyup="renderInventory()">
-
-    <div id="inventory-list"></div>
 </div>
 
-<div id="shoppingModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 style="margin:0; color:#00d4ff;">🛒 Benötigte Artikel</h3>
-            <span class="close-modal" onclick="closeShoppingList()">&times;</span>
+<div id="modalTransfer" class="overlay">
+    <div class="modal">
+        <h3>📦 Umlagern</h3>
+        <p id="transferItemName" style="color: var(--accent-purple); font-weight: bold;"></p>
+        <label>Menge</label>
+        <input type="number" id="transQty">
+        <label>Ziel-Lager</label>
+        <select id="transTarget"></select>
+        <button class="btn btn-transfer" style="width:100%" onclick="executeTransfer()">Verschieben</button>
+        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeModals()">Abbrechen</button>
+    </div>
+</div>
+
+<div id="modalCopy" class="overlay">
+    <div class="modal">
+        <h3>📋 Standort-Profil kopieren</h3>
+        <p style="font-size: 13px; color: var(--text-dim);">Überträgt alle Artikelnamen und deren <b>Mindestbestände</b> von einem Lager auf ein anderes.</p>
+        
+        <label>Kopieren von (Quelle):</label>
+        <select id="copySource"></select>
+        
+        <label>Übertragen nach (Ziel):</label>
+        <select id="copyTarget"></select>
+        
+        <div style="background: rgba(162, 155, 254, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--accent-purple);">
+            <small style="color: var(--accent-purple);">⚠️ Existierende Artikel im Ziel werden aktualisiert. Neue Artikel werden mit Bestand 0 angelegt.</small>
         </div>
-        <div id="shopping-list-content">
-            </div>
-        <button class="btn-copy" onclick="copyShoppingList()">📋 Liste in Zwischenablage kopieren</button>
+
+        <button class="btn btn-primary" style="width:100%" onclick="executeProfileCopy()">Profil jetzt übertragen</button>
+        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeModals()">Abbrechen</button>
     </div>
 </div>
 
 <script>
-    let storage = JSON.parse(localStorage.getItem('universal_storage')) || [];
+    let locations = JSON.parse(localStorage.getItem('L_LOCS')) || ["Hauptlager", "Auto Domi", "Garage", "Anhänger"];
+    let inventory = JSON.parse(localStorage.getItem('L_INV')) || [];
+    let history = JSON.parse(localStorage.getItem('L_HIST')) || [];
 
-    function addItem() {
-        const name = document.getElementById('name').value;
-        const price = parseFloat(document.getElementById('price').value) || 0;
-        const stock = parseInt(document.getElementById('stock').value) || 0;
-        const min = parseInt(document.getElementById('min').value) || 0;
+    let currentView = 'dashboard'; 
+    let activeLoc = null;
+    let transferSourceIdx = null;
 
-        if(name) {
-            storage.push({ name, price, stock, min });
-            document.getElementById('name').value = '';
-            document.getElementById('price').value = '';
-            document.getElementById('stock').value = '';
-            document.getElementById('min').value = '';
-            saveAndRender();
-        }
+    function save() {
+        localStorage.setItem('L_LOCS', JSON.stringify(locations));
+        localStorage.setItem('L_INV', JSON.stringify(inventory));
+        localStorage.setItem('L_HIST', JSON.stringify(history));
     }
 
-    function changeStock(index, amount) {
-        storage[index].stock = Math.max(0, storage[index].stock + amount);
-        saveAndRender();
+    function logAction(msg) {
+        history.unshift(`${new Date().toLocaleString('de-DE')}: ${msg}`);
+        if(history.length > 50) history.pop();
+        save();
     }
 
-    function quickDeduct(index) {
-        const input = document.getElementById(`quick-${index}`);
-        const val = parseInt(input.value) || 0;
-        storage[index].stock = Math.max(0, storage[index].stock - val);
-        input.value = '';
-        saveAndRender();
+    function render() {
+        const root = document.getElementById('app-root');
+        const term = document.getElementById('globalSearch').value.toLowerCase();
+        root.innerHTML = '';
+
+        if(term) { renderSearch(root, term); } 
+        else if(currentView === 'dashboard') { renderDashboard(root); } 
+        else { renderLocationView(root); }
     }
 
-    function deleteItem(index) {
-        if(confirm("Artikel wirklich löschen?")) {
-            storage.splice(index, 1);
-            saveAndRender();
-        }
-    }
-
-    function saveAndRender() {
-        localStorage.setItem('universal_storage', JSON.stringify(storage));
-        renderInventory();
-    }
-
-    function renderInventory() {
-        const list = document.getElementById('inventory-list');
-        const searchTerm = document.getElementById('search').value.toLowerCase();
-        list.innerHTML = '';
+    function renderDashboard(container) {
+        container.innerHTML = `
+            <div class="nav-buttons">
+                <button class="btn btn-primary" onclick="openItemModal(null, locations[0])">+ Global Neu</button>
+                <button class="btn btn-outline" onclick="openCopyModal()">📋 Profile kopieren</button>
+            </div>
+            <h2>Lager-Übersicht</h2>`;
         
-        let totalVal = 0;
-        let count = 0;
-        let lowStockCount = 0;
+        const grid = document.createElement('div');
+        grid.className = 'dashboard-grid';
 
-        storage.forEach((item, index) => {
-            const isLow = item.stock <= item.min;
-            if(isLow) lowStockCount++;
+        locations.forEach(loc => {
+            const items = inventory.filter(i => i.location === loc);
+            const low = items.filter(i => i.stock <= i.min && i.min > 0).length;
+            grid.innerHTML += `
+                <div class="location-card" onclick="viewLoc('${loc}')">
+                    <div>
+                        <h3>${loc}</h3>
+                        <div class="stats">${items.length} Typen | ${items.reduce((a,b)=>a+b.stock,0)} Stk.</div>
+                    </div>
+                    ${low > 0 ? `<div class="warn-tag">⚠️ ${low} auffüllen</div>` : ''}
+                </div>`;
+        });
+        container.appendChild(grid);
+        renderHistory(container);
+    }
 
-            if(!item.name.toLowerCase().includes(searchTerm)) return;
+    function renderLocationView(container) {
+        container.innerHTML = `
+            <div style="cursor:pointer; color:var(--accent-purple); margin-bottom:20px;" onclick="currentView='dashboard'; render();">← Zurück</div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>${activeLoc}</h2>
+                <button class="btn btn-primary" onclick="openItemModal(null, '${activeLoc}')">+ Neu</button>
+            </div><br>`;
+        inventory.filter(i => i.location === activeLoc).forEach(item => container.appendChild(createItemCard(item)));
+    }
 
-            totalVal += (item.stock * item.price);
-            count++;
+    function renderSearch(container, term) {
+        container.innerHTML = `<h2>Suche: "${term}"</h2><br>`;
+        inventory.filter(i => i.name.toLowerCase().includes(term) || (term === 'leer' && i.stock <= i.min))
+                 .forEach(item => container.appendChild(createItemCard(item)));
+    }
 
-            const div = document.createElement('div');
-            div.className = 'inventory-item' + (isLow ? ' low-stock' : '');
-            
-            div.innerHTML = `
-                <div class="item-info">
-                    <strong>${item.name}</strong><br>
-                    <span style="font-size: 11px; color: #888;">Einzel: ${item.price.toFixed(2)}€ | Gesamt: ${(item.stock * item.price).toFixed(2)}€</span><br>
-                    <span class="stock-display">Bestand: ${item.stock} Stück</span> 
-                    ${isLow ? '<span style="color:#ff4444; font-size:10px;">⚠️ NACHBESTELLEN!</span>' : ''}
-                </div>
-                <div class="item-controls">
-                    <input type="number" id="quick-${index}" class="qty-input" placeholder="Anz.">
-                    <button class="btn-minus" onclick="quickDeduct(${index})" title="Abziehen">-</button>
-                    <button class="btn-plus" onclick="changeStock(${index}, 10)" title="Plus 10">+10</button>
-                    <button class="btn-del" onclick="deleteItem(${index})">🗑️</button>
-                </div>
-            `;
-            list.appendChild(div);
+    function createItemCard(item) {
+        const idx = inventory.indexOf(item);
+        const isLow = item.stock <= item.min && item.min > 0;
+        const div = document.createElement('div');
+        div.className = 'item-row' + (isLow ? ' is-low' : '');
+        div.innerHTML = `
+            <div class="item-info">
+                <small>${item.location}</small>
+                <b>${item.name}</b>
+                <span class="min-info">Soll: ${item.min}</span>
+            </div>
+            <div class="stock-badge">${item.stock}</div>
+            <div class="action-group">
+                <button class="btn btn-outline" onclick="changeStock(${idx}, 1)">+</button>
+                <button class="btn btn-outline" onclick="changeStock(${idx}, -1)">-</button>
+                <button class="btn btn-transfer" onclick="openTransfer(${idx})">📦</button>
+                <button class="btn btn-outline" onclick="openItemModal(${idx}, '${item.location}')">⚙️</button>
+            </div>`;
+        return div;
+    }
+
+    function openCopyModal() {
+        const src = document.getElementById('copySource');
+        const target = document.getElementById('copyTarget');
+        const opts = locations.map(l => `<option value="${l}">${l}</option>`).join('');
+        src.innerHTML = opts; target.innerHTML = opts;
+        document.getElementById('modalCopy').style.display = 'block';
+    }
+
+    function executeProfileCopy() {
+        const src = document.getElementById('copySource').value;
+        const target = document.getElementById('copyTarget').value;
+        if(src === target) return alert("Quelle und Ziel müssen unterschiedlich sein!");
+
+        const sourceItems = inventory.filter(i => i.location === src);
+        sourceItems.forEach(sItem => {
+            let tItem = inventory.find(i => i.name === sItem.name && i.location === target);
+            if(tItem) {
+                tItem.min = sItem.min; // Mindestbestand aktualisieren
+            } else {
+                inventory.push({ name: sItem.name, stock: 0, min: sItem.min, location: target });
+            }
         });
 
-        document.getElementById('total-items').innerText = `Artikel: ${count}`;
-        document.getElementById('total-value').innerText = `Gesamtwert: ${totalVal.toLocaleString('de-DE', {style:'currency', currency:'EUR'})}`;
-        document.getElementById('low-count-badge').innerText = lowStockCount;
+        logAction(`PROFIL KOPIERT: Von ${src} nach ${target}`);
+        closeModals();
+        render();
     }
 
-    // Modal Funktionen
-    function openShoppingList() {
-        const modal = document.getElementById('shoppingModal');
-        const content = document.getElementById('shopping-list-content');
-        content.innerHTML = '';
-        
-        const lowStockItems = storage.filter(item => item.stock <= item.min);
-        
-        if(lowStockItems.length === 0) {
-            content.innerHTML = '<p style="text-align:center; color:#888;">Alles bestens! Keine Artikel unter Mindestbestand.</p>';
+    // Standard Funktionen
+    function viewLoc(loc) { activeLoc = loc; currentView = 'location'; render(); }
+    function changeStock(idx, amt) { inventory[idx].stock = Math.max(0, inventory[idx].stock + amt); save(); render(); }
+    function closeModals() { document.querySelectorAll('.overlay').forEach(o => o.style.display='none'); }
+    
+    function openItemModal(idx, loc) {
+        document.getElementById('editIdx').value = idx !== null ? idx : "";
+        const s = document.getElementById('inLoc');
+        s.innerHTML = locations.map(l => `<option value="${l}" ${l===loc?'selected':''}>${l}</option>`).join('');
+        if(idx !== null) {
+            const i = inventory[idx];
+            document.getElementById('inName').value = i.name;
+            document.getElementById('inStock').value = i.stock;
+            document.getElementById('inMin').value = i.min;
         } else {
-            lowStockItems.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'shopping-list-item';
-                div.innerHTML = `<strong>${item.name}</strong><br>Stand: ${item.stock} (Mindestens: ${item.min})`;
-                content.appendChild(div);
-            });
+            document.getElementById('inName').value = ""; document.getElementById('inStock').value = ""; document.getElementById('inMin').value = 0;
         }
-        modal.style.display = "block";
+        document.getElementById('modalItem').style.display = 'block';
     }
 
-    function closeShoppingList() {
-        document.getElementById('shoppingModal').style.display = "none";
+    function saveItem() {
+        const idx = document.getElementById('editIdx').value;
+        const data = { 
+            name: document.getElementById('inName').value, 
+            stock: parseInt(document.getElementById('inStock').value)||0, 
+            min: parseInt(document.getElementById('inMin').value)||0, 
+            location: document.getElementById('inLoc').value 
+        };
+        if(idx !== "") inventory[idx] = data; else inventory.push(data);
+        logAction(`GESPEICHERT: ${data.name} (${data.location})`);
+        closeModals(); render();
     }
 
-    function copyShoppingList() {
-        const lowStockItems = storage.filter(item => item.stock <= item.min);
-        if(lowStockItems.length === 0) return alert("Nichts zu kopieren!");
-
-        let text = "🛒 EINKAUFSLISTE LAGER:\n\n";
-        lowStockItems.forEach(item => {
-            text += `- ${item.name} (Aktuell: ${item.stock} Stk., Min-Soll: ${item.min} Stk.)\n`;
-        });
-
-        navigator.clipboard.writeText(text).then(() => {
-            alert("Liste wurde in die Zwischenablage kopiert!");
-        });
+    function openTransfer(idx) {
+        transferSourceIdx = idx;
+        const i = inventory[idx];
+        document.getElementById('transferItemName').innerText = `${i.name} (${i.location})`;
+        document.getElementById('transTarget').innerHTML = locations.filter(l => l !== i.location).map(l => `<option value="${l}">${l}</option>`).join('');
+        document.getElementById('modalTransfer').style.display = 'block';
     }
 
-    // Schließen wenn man außerhalb klickt
-    window.onclick = function(event) {
-        const modal = document.getElementById('shoppingModal');
-        if (event.target == modal) closeShoppingList();
+    function executeTransfer() {
+        const qty = parseInt(document.getElementById('transQty').value);
+        const target = document.getElementById('transTarget').value;
+        const source = inventory[transferSourceIdx];
+        if(!qty || qty > source.stock) return alert("Menge ungültig!");
+
+        source.stock -= qty;
+        let tItem = inventory.find(i => i.name === source.name && i.location === target);
+        if(tItem) tItem.stock += qty; else inventory.push({name: source.name, stock: qty, min: 0, location: target});
+        
+        logAction(`TRANSFER: ${qty}x ${source.name} von ${source.location} nach ${target}`);
+        closeModals(); render();
     }
 
-    window.onload = renderInventory;
+    function renderHistory(c) {
+        const h = document.createElement('div');
+        h.style.marginTop = "30px";
+        h.innerHTML = `<h3>Logbuch</h3><div class="history-list">${history.map(x => `<div class="history-item">${x}</div>`).join('')}</div>`;
+        c.appendChild(h);
+    }
+
+    window.onload = render;
 </script>
-
 </body>
 </html>
