@@ -34,21 +34,21 @@
         .min-box { background: #1a1a1a; padding: 5px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid #444; }
         .min-input { width: 50px !important; padding: 2px !important; margin: 0 !important; height: auto !important; text-align: center; border: none !important; background: none !important; color: #00d4ff !important; font-weight: bold; font-size: 14px; }
 
-        /* Modals */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); }
         .modal-content { background: var(--card); margin: 15% auto; padding: 25px; border-radius: 15px; width: 85%; max-width: 450px; border: 1px solid var(--primary); }
         
-        /* Neue Einkaufslisten-Karten: Rot hinterlegt */
+        /* FIX: Diese Karten sind jetzt SICHER rot hinterlegt */
         .shopping-card { 
-            background: #b30000; /* Dunkelrot für hohen Kontrast */
+            background-color: #d32f2f !important; 
             padding: 15px; 
             border-radius: 10px; 
             margin-bottom: 10px; 
-            color: white; /* Weiße Schrift */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            color: #ffffff !important; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border: 1px solid #ff6666;
         }
-        .shopping-card strong { font-size: 18px; display: block; margin-bottom: 5px; }
-        .shopping-card .locs { color: #e0e0e0; font-size: 13px; font-weight: normal; }
+        .shopping-card strong { font-size: 18px; display: block; margin-bottom: 5px; color: white !important; }
+        .shopping-card .locs { color: #f0f0f0 !important; font-size: 13px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -82,7 +82,7 @@
     </div>
 
     <div style="margin: 20px 0;">
-        <input type="text" id="search" style="border: 2px solid var(--primary);" placeholder="🔍 Global suchen (Lagerübergreifend)..." onkeyup="render()">
+        <input type="text" id="search" style="border: 2px solid var(--primary);" placeholder="🔍 Global suchen..." onkeyup="render()">
     </div>
 
     <div id="inventory-list"></div>
@@ -91,7 +91,7 @@
 <div id="saveModal" class="modal">
     <div class="modal-content">
         <h3 style="color:var(--success)">📍 Ziel-Lager wählen</h3>
-        <p style="font-size:14px; color:#aaa;">In welches Lager soll der Artikel gespeichert werden?</p>
+        <p style="font-size:14px; color:#aaa;">Wo soll der Artikel hin?</p>
         <select id="select-target-wh" style="margin: 15px 0;"></select>
         <button onclick="confirmSaveItem()" style="background:var(--success); color:white; width:100%; padding:15px; border-radius:10px;">Jetzt Einlagern</button>
         <button onclick="closeModal('saveModal')" style="background:none; color:white; margin-top:10px; width:100%;">Abbrechen</button>
@@ -165,8 +165,10 @@
         db[wh][idx].min = parseInt(newVal) || 0;
         localStorage.setItem('d3d_storage_v4', JSON.stringify(db));
         const itemDiv = document.getElementById(`item-${wh}-${idx}`);
-        if(db[wh][idx].stock <= db[wh][idx].min) itemDiv.classList.add('low-stock');
-        else itemDiv.classList.remove('low-stock');
+        if(itemDiv) {
+            if(db[wh][idx].stock <= db[wh][idx].min) itemDiv.classList.add('low-stock');
+            else itemDiv.classList.remove('low-stock');
+        }
         updateBadge();
     }
 
@@ -236,6 +238,7 @@
         updateBadge();
     }
 
+    // FIX: Komplett überarbeitete Logik ohne Mengen-Text
     function openShoppingList() {
         const content = document.getElementById('shopping-list-content');
         content.innerHTML = '';
@@ -252,13 +255,14 @@
 
         const entries = Object.entries(summary);
         if(entries.length === 0) {
-            content.innerHTML = "<p style='text-align:center; padding:20px; color:#888;'>Alles bestens! Keine Nachbestellung nötig.</p>";
+            content.innerHTML = "<p style='text-align:center; padding:20px; color:#888;'>Alles bestens!</p>";
         } else {
             entries.forEach(([name, data]) => {
+                // Hier wird NUR der Name und das Lager ausgegeben
                 content.innerHTML += `
                     <div class="shopping-card">
                         <strong>${name}</strong>
-                        <div class="locs">Bedarf in: ${data.warehouses.join(", ")}</div>
+                        <div class="locs">Fehlt in: ${data.warehouses.join(", ")}</div>
                     </div>`;
             });
         }
@@ -284,10 +288,10 @@
             let existing = db[target].find(i => i.name === item.name);
             if(existing) existing.stock += qty; else db[target].push({...item, stock: qty});
             closeModal('moveModal'); save();
-        } else { alert("Nicht genug Bestand vorhanden!"); }
+        } else { alert("Bestand zu niedrig!"); }
     }
 
-    function deleteItem(wh, idx) { if(confirm("Diesen Artikel wirklich aus " + wh + " entfernen?")) { db[wh].splice(idx, 1); save(); } }
+    function deleteItem(wh, idx) { if(confirm("Löschen?")) { db[wh].splice(idx, 1); save(); } }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     window.onclick = function(event) { if(event.target.className === 'modal') closeModal(event.target.id); }
 
