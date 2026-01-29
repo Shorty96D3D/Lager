@@ -9,18 +9,18 @@
         body { font-family: -apple-system, sans-serif; padding: 10px; background: var(--bg); color: var(--text); line-height: 1.4; margin: 0; padding-bottom: 50px; }
         
         .card { background: var(--card); padding: 15px; border-radius: 12px; max-width: 600px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
-        h2 { color: var(--success); text-align: center; text-transform: uppercase; margin-top: 0; }
+        h2 { color: var(--success); text-align: center; text-transform: uppercase; margin-bottom: 15px; }
         
         .section { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333; }
-        h3 { font-size: 14px; margin: 0 0 10px 0; color: #00d4ff; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        h3 { font-size: 13px; margin: 0 0 10px 0; color: #00d4ff; text-transform: uppercase; border-bottom: 1px solid #444; padding-bottom: 5px; }
 
-        label { display: block; margin-top: 8px; font-size: 11px; color: #888; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; margin-top: 4px; border: 1px solid #444; border-radius: 6px; background: #121212; color: white; font-size: 16px; box-sizing: border-box; }
+        label { display: block; margin-top: 8px; font-size: 10px; color: #888; text-transform: uppercase; }
+        input, select { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #444; border-radius: 6px; background: #121212; color: white; font-size: 15px; box-sizing: border-box; }
         
         /* Lager-Wechsler */
-        .warehouse-nav { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none; }
-        .warehouse-tab { background: #333; padding: 8px 15px; border-radius: 20px; white-space: nowrap; cursor: pointer; font-size: 13px; border: 1px solid transparent; }
-        .warehouse-tab.active { background: var(--primary); border-color: #00d4ff; font-weight: bold; }
+        .warehouse-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
+        .warehouse-tab { background: #333; padding: 8px 16px; border-radius: 20px; white-space: nowrap; cursor: pointer; font-size: 13px; }
+        .warehouse-tab.active { background: var(--primary); font-weight: bold; border: 1px solid #00d4ff; }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
@@ -29,21 +29,24 @@
         .btn-shopping { background: var(--primary); color: white; width: 100%; padding: 12px; margin-bottom: 15px; gap: 8px; }
 
         /* Inventar Liste */
-        .inventory-item { background: #2a2a2a; margin-bottom: 8px; padding: 12px; border-radius: 8px; border-left: 5px solid #444; }
+        .inventory-item { background: #2a2a2a; margin-bottom: 10px; padding: 12px; border-radius: 8px; border-left: 5px solid #444; position: relative; }
         .low-stock { border-left-color: var(--danger) !important; background: #3a1a1a; }
         
-        .item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .item-controls { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5px; }
-        
-        .qty-btn { height: 40px; font-size: 18px; color: white; }
-        .btn-minus { background: var(--danger); }
-        .btn-plus { background: var(--primary); }
-        .btn-move { background: #6c757d; font-size: 14px; }
+        .location-badge { position: absolute; top: 8px; right: 8px; background: #444; font-size: 9px; padding: 2px 6px; border-radius: 4px; color: #00d4ff; }
 
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
-        .modal-content { background: var(--card); margin: 10% auto; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; border: 1px solid var(--primary); }
-        .close-modal { float: right; font-size: 28px; color: #888; cursor: pointer; }
+        .item-header { margin-bottom: 12px; }
+        .item-controls { display: grid; grid-template-columns: 1fr 1.2fr 1fr 0.5fr; gap: 10px; align-items: center; }
+        
+        .qty-input { text-align: center; height: 45px; margin-top: 0; font-size: 18px; font-weight: bold; border: 1px solid #555; }
+        .btn-qty { height: 45px; font-size: 20px; color: white; }
+        .plus { background: var(--primary); order: 1; }
+        .minus { background: var(--danger); order: 3; }
+        .move-btn { background: #6c757d; height: 45px; order: 4; }
+
+        .search-area { background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid var(--primary); margin-bottom: 20px; }
+
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: var(--card); margin: 15% auto; padding: 20px; border-radius: 12px; width: 85%; max-width: 400px; }
     </style>
 </head>
 <body>
@@ -58,67 +61,61 @@
     </button>
 
     <div class="section">
-        <h3>🏠 Neues Lager / Artikel</h3>
+        <h3>🏠 Neues Lager hinzufügen</h3>
         <div class="grid">
-            <input type="text" id="new-wh-name" placeholder="Name Lager...">
-            <button onclick="addWarehouse()" style="background:#555; color:white; font-size:12px;">+ Lager erstellen</button>
-        </div>
-        <hr style="border:0; border-top:1px solid #444; margin:10px 0;">
-        <input type="text" id="name" placeholder="Bezeichnung (z.B. Schrauben)">
-        <div class="grid">
-            <input type="number" id="price" step="0.01" placeholder="Preis €">
-            <input type="number" id="stock" placeholder="Bestand">
-            <input type="number" id="min" placeholder="Warnwert">
-            <button class="btn-add" onclick="addItem()" style="margin:0;">Speichern</button>
+            <input type="text" id="new-wh-name" placeholder="Name (z.B. Werkstatt)">
+            <button onclick="addWarehouse()" style="background:#444; color:white;">+ Erstellen</button>
         </div>
     </div>
 
-    <input type="text" id="search" style="border: 2px solid var(--primary); margin-bottom:15px;" placeholder="🔍 Artikel suchen..." onkeyup="render()">
+    <div class="section">
+        <h3>✨ Artikel hinzufügen</h3>
+        <input type="text" id="name" placeholder="Bezeichnung (z.B. Schrauben M8)">
+        <div class="grid">
+            <div><label>Preis €/Stk</label><input type="number" id="price" step="0.01" placeholder="0.50"></div>
+            <div><label>Bestand</label><input type="number" id="stock" placeholder="100"></div>
+            <div><label>Warnwert</label><input type="number" id="min" placeholder="10"></div>
+        </div>
+        <button class="btn-add" onclick="addItem()">In "${currentWH}" speichern</button>
+    </div>
+
+    <div class="search-area">
+        <label style="color:var(--primary)">Lagerübergreifende Suche</label>
+        <input type="text" id="search" placeholder="🔍 Alle Lager durchsuchen..." onkeyup="render()">
+    </div>
 
     <div id="inventory-list"></div>
 </div>
 
 <div id="moveModal" class="modal">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('moveModal')">&times;</span>
-        <h3>📦 Artikel umlagern</h3>
-        <p id="move-info" style="font-size:13px; color:#888;"></p>
-        <label>Ziel-Lager:</label>
+        <h3>✈️ Umlagern</h3>
+        <p id="move-info"></p>
         <select id="target-warehouse"></select>
-        <label>Menge:</label>
         <input type="number" id="move-qty" value="1">
-        <button class="btn-add" onclick="executeMove()">Umlagerung bestätigen</button>
+        <button class="btn-add" onclick="executeMove()">Verschieben</button>
+        <button onclick="closeModal('moveModal')" style="background:none; color:white; margin-top:10px; width:100%;">Abbrechen</button>
     </div>
 </div>
 
 <div id="shoppingModal" class="modal">
-    <div class="modal-content" style="max-width:500px;">
-        <span class="close-modal" onclick="closeModal('shoppingModal')">&times;</span>
-        <h3 style="color:var(--primary)">🛒 Global Fehlende Artikel</h3>
-        <div id="shopping-list-content" style="max-height:300px; overflow-y:auto; margin-bottom:15px;"></div>
-        <button onclick="copyList()" style="background:#6c757d; color:white; width:100%; padding:10px;">📋 Kopieren</button>
+    <div class="modal-content">
+        <h3>🛒 Einkaufsliste</h3>
+        <div id="shopping-list-content" style="max-height:300px; overflow-y:auto;"></div>
+        <button onclick="closeModal('shoppingModal')" style="background:var(--primary); color:white; width:100%; padding:10px; margin-top:10px;">Schließen</button>
     </div>
 </div>
 
 <script>
-    // Datenstruktur: { "Lagername": [ {name, price, stock, min}, ... ], ... }
     let db = JSON.parse(localStorage.getItem('d3d_storage_v4')) || { "Hauptlager": [] };
-    let currentWH = Object.keys(db)[0];
+    let currentWH = Object.keys(db)[0] || "Hauptlager";
     let moveTarget = { itemIdx: null, fromWH: '' };
 
-    function save() {
-        localStorage.setItem('d3d_storage_v4', JSON.stringify(db));
-        render();
-    }
+    function save() { localStorage.setItem('d3d_storage_v4', JSON.stringify(db)); render(); }
 
     function addWarehouse() {
         const name = document.getElementById('new-wh-name').value.trim();
-        if(name && !db[name]) {
-            db[name] = [];
-            currentWH = name;
-            document.getElementById('new-wh-name').value = '';
-            save();
-        }
+        if(name && !db[name]) { db[name] = []; currentWH = name; document.getElementById('new-wh-name').value = ''; save(); }
     }
 
     function addItem() {
@@ -126,7 +123,6 @@
         const price = parseFloat(document.getElementById('price').value) || 0;
         const stock = parseInt(document.getElementById('stock').value) || 0;
         const min = parseInt(document.getElementById('min').value) || 0;
-
         if(name) {
             db[currentWH].push({ name, price, stock, min });
             ["name", "price", "stock", "min"].forEach(id => document.getElementById(id).value = '');
@@ -134,28 +130,78 @@
         }
     }
 
-    function updateStock(idx, amount) {
-        db[currentWH][idx].stock = Math.max(0, db[currentWH][idx].stock + amount);
+    function handleQty(wh, idx, isPlus) {
+        const input = document.getElementById(`qty-input-${wh}-${idx}`);
+        const change = parseInt(input.value) || 1;
+        db[wh][idx].stock = isPlus ? db[wh][idx].stock + change : Math.max(0, db[wh][idx].stock - change);
+        input.value = '';
         save();
     }
 
-    function deleteItem(idx) {
-        if(confirm("Löschen?")) { db[currentWH].splice(idx, 1); save(); }
+    function render() {
+        const tabs = document.getElementById('warehouse-tabs');
+        tabs.innerHTML = '';
+        Object.keys(db).forEach(wh => {
+            const div = document.createElement('div');
+            div.className = `warehouse-tab ${wh === currentWH ? 'active' : ''}`;
+            div.innerText = wh;
+            div.onclick = () => { currentWH = wh; document.getElementById('search').value = ''; render(); };
+            tabs.appendChild(div);
+        });
+
+        const list = document.getElementById('inventory-list');
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        list.innerHTML = '';
+        
+        let lowCount = 0;
+        
+        // Lagerübergreifende Logik
+        Object.keys(db).forEach(wh => {
+            db[wh].forEach((item, idx) => {
+                if(item.stock <= item.min) lowCount++;
+                
+                // Falls Suche aktiv ist, zeige Treffer aus allen Lagern
+                // Falls Suche leer ist, zeige nur aktuelles Lager
+                const isSearchActive = searchTerm.length > 0;
+                if(isSearchActive) {
+                    if(!item.name.toLowerCase().includes(searchTerm)) return;
+                } else {
+                    if(wh !== currentWH) return;
+                }
+
+                const isLow = item.stock <= item.min;
+                const div = document.createElement('div');
+                div.className = `inventory-item ${isLow ? 'low-stock' : ''}`;
+                div.innerHTML = `
+                    ${isSearchActive ? `<span class="location-badge">${wh}</span>` : ''}
+                    <div class="item-header">
+                        <strong style="font-size:16px;">${item.name}</strong><br>
+                        <small style="color:#aaa">${item.price.toFixed(2)}€/Stk | Wert: ${(item.stock*item.price).toFixed(2)}€</small>
+                    </div>
+                    <div style="margin-bottom:10px; font-weight:bold; font-size:18px;">
+                        Bestand: ${item.stock} <small style="font-weight:normal; font-size:11px; color:#888;">(Min: ${item.min})</small>
+                    </div>
+                    <div class="item-controls">
+                        <button class="btn-qty plus" onclick="handleQty('${wh}', ${idx}, true)">+</button>
+                        <input type="number" id="qty-input-${wh}-${idx}" class="qty-input" placeholder="Anz.">
+                        <button class="btn-qty minus" onclick="handleQty('${wh}', ${idx}, false)">-</button>
+                        <button class="move-btn" onclick="openMove('${wh}', ${idx})">✈️</button>
+                    </div>
+                    <button onclick="deleteItem('${wh}', ${idx})" style="background:none; color:#555; width:100%; font-size:10px; margin-top:12px; border-top:1px solid #333; padding-top:5px;">🗑️ Artikel löschen</button>
+                `;
+                list.appendChild(div);
+            });
+        });
+        document.getElementById('low-count-badge').innerText = lowCount;
     }
 
-    // UMLAGERN LOGIK
-    function openMove(idx) {
-        moveTarget = { itemIdx: idx, fromWH: currentWH };
-        const item = db[currentWH][idx];
-        document.getElementById('move-info').innerText = `${item.name} von ${currentWH} verschieben.`;
-        
+    function openMove(wh, idx) {
+        moveTarget = { itemIdx: idx, fromWH: wh };
+        const item = db[wh][idx];
+        document.getElementById('move-info').innerText = `${item.name} von ${wh} verschieben:`;
         const select = document.getElementById('target-warehouse');
         select.innerHTML = '';
-        Object.keys(db).forEach(wh => {
-            if(wh !== currentWH) select.options.add(new Option(wh, wh));
-        });
-        
-        if(select.options.length === 0) return alert("Erstelle erst ein zweites Lager!");
+        Object.keys(db).forEach(name => { if(name !== wh) select.options.add(new Option(name, name)); });
         document.getElementById('moveModal').style.display = 'block';
     }
 
@@ -163,110 +209,26 @@
         const qty = parseInt(document.getElementById('move-qty').value);
         const target = document.getElementById('target-warehouse').value;
         const item = db[moveTarget.fromWH][moveTarget.itemIdx];
-
         if(qty > 0 && item.stock >= qty) {
             item.stock -= qty;
-            // Prüfen ob Artikel im Ziellager existiert
             let existing = db[target].find(i => i.name === item.name);
-            if(existing) {
-                existing.stock += qty;
-            } else {
-                db[target].push({ ...item, stock: qty });
-            }
-            closeModal('moveModal');
-            save();
-        } else {
-            alert("Nicht genug Bestand!");
+            if(existing) existing.stock += qty; else db[target].push({...item, stock: qty});
+            closeModal('moveModal'); save();
         }
     }
 
+    function deleteItem(wh, idx) { if(confirm("Löschen?")) { db[wh].splice(idx, 1); save(); } }
     function openShoppingList() {
         const content = document.getElementById('shopping-list-content');
         content.innerHTML = '';
-        let globalLow = [];
-
         Object.keys(db).forEach(wh => {
-            db[wh].forEach(item => {
-                if(item.stock <= item.min) globalLow.push({ ...item, wh });
+            db[wh].forEach(i => {
+                if(i.stock <= i.min) content.innerHTML += `<div style="padding:10px; border-bottom:1px solid #444;"><strong>${i.name}</strong> (${wh})<br>Bestand: ${i.stock} | Min: ${i.min}</div>`;
             });
         });
-
-        if(globalLow.length === 0) {
-            content.innerHTML = "<p>Alles voll!</p>";
-        } else {
-            globalLow.forEach(i => {
-                content.innerHTML += `<div style="padding:8px; border-bottom:1px solid #333;">
-                    <strong>${i.name}</strong> (${i.wh})<br>
-                    Bestand: <span style="color:var(--danger)">${i.stock}</span> / Soll: ${i.min}
-                </div>`;
-            });
-        }
         document.getElementById('shoppingModal').style.display = 'block';
     }
-
-    function render() {
-        // Tabs
-        const tabs = document.getElementById('warehouse-tabs');
-        tabs.innerHTML = '';
-        Object.keys(db).forEach(wh => {
-            const span = document.createElement('div');
-            span.className = `warehouse-tab ${wh === currentWH ? 'active' : ''}`;
-            span.innerText = wh;
-            span.onclick = () => { currentWH = wh; render(); };
-            tabs.appendChild(span);
-        });
-
-        // Liste
-        const list = document.getElementById('inventory-list');
-        const search = document.getElementById('search').value.toLowerCase();
-        list.innerHTML = '';
-        let lowCount = 0;
-
-        // Global low count badge
-        Object.values(db).flat().forEach(i => { if(i.stock <= i.min) lowCount++; });
-        document.getElementById('low-count-badge').innerText = lowCount;
-
-        db[currentWH].forEach((item, idx) => {
-            if(!item.name.toLowerCase().includes(search)) return;
-            const isLow = item.stock <= item.min;
-
-            const div = document.createElement('div');
-            div.className = `inventory-item ${isLow ? 'low-stock' : ''}`;
-            div.innerHTML = `
-                <div class="item-header">
-                    <div>
-                        <strong>${item.name}</strong><br>
-                        <small style="color:#888">${item.price.toFixed(2)}€/Stk | Gesamt: ${(item.stock*item.price).toFixed(2)}€</small>
-                    </div>
-                    <div style="text-align:right">
-                        <span style="font-size:18px; font-weight:bold;">${item.stock}</span><br>
-                        <small style="font-size:10px; color:#aaa">Min: ${item.min}</small>
-                    </div>
-                </div>
-                <div class="item-controls">
-                    <button class="qty-btn btn-minus" onclick="updateStock(${idx}, -1)">-1</button>
-                    <input type="number" id="quick-${idx}" placeholder="Anz." style="margin:0; padding:5px; height:40px; text-align:center;">
-                    <button class="qty-btn btn-plus" onclick="updateStock(${idx}, 1)">+1</button>
-                    <button class="btn-move" onclick="openMove(${idx})">✈️</button>
-                    <button onclick="deleteItem(${idx})" style="background:none; color:#555; grid-column: span 4; font-size:10px; margin-top:5px;">🗑️ Artikel löschen</button>
-                </div>
-            `;
-            list.appendChild(div);
-            
-            // Event Listener für Quick-Input
-            const input = document.getElementById(`quick-${idx}`);
-            input.onchange = () => {
-                const val = parseInt(input.value);
-                if(!isNaN(val)) { updateStock(idx, val); input.value = ''; }
-            };
-        });
-    }
-
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function copyList() {
-        const content = document.getElementById('shopping-list-content').innerText;
-        navigator.clipboard.writeText(content).then(() => alert("Kopiert!"));
-    }
 
     window.onload = render;
 </script>
