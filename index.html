@@ -17,36 +17,27 @@
         label { display: block; margin-top: 8px; font-size: 10px; color: #888; text-transform: uppercase; }
         input, select { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #444; border-radius: 6px; background: #121212; color: white; font-size: 15px; box-sizing: border-box; }
         
-        /* Lager-Wechsler */
         .warehouse-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
         .warehouse-tab { background: #333; padding: 8px 16px; border-radius: 20px; white-space: nowrap; cursor: pointer; font-size: 13px; }
         .warehouse-tab.active { background: var(--primary); font-weight: bold; border: 1px solid #00d4ff; }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        
         button { border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-add { background: var(--success); color: white; width: 100%; padding: 12px; margin-top: 10px; }
         .btn-shopping { background: var(--primary); color: white; width: 100%; padding: 12px; margin-bottom: 15px; gap: 8px; }
 
-        /* Inventar Liste */
         .inventory-item { background: #2a2a2a; margin-bottom: 10px; padding: 12px; border-radius: 8px; border-left: 5px solid #444; position: relative; }
         .low-stock { border-left-color: var(--danger) !important; background: #3a1a1a; }
         
         .location-badge { position: absolute; top: 8px; right: 8px; background: #444; font-size: 9px; padding: 2px 6px; border-radius: 4px; color: #00d4ff; }
-
-        .item-header { margin-bottom: 12px; }
         .item-controls { display: grid; grid-template-columns: 1fr 1.2fr 1fr 0.5fr; gap: 10px; align-items: center; }
         
         .qty-input { text-align: center; height: 45px; margin-top: 0; font-size: 18px; font-weight: bold; border: 1px solid #555; }
-        .btn-qty { height: 45px; font-size: 20px; color: white; }
-        .plus { background: var(--primary); order: 1; }
-        .minus { background: var(--danger); order: 3; }
-        .move-btn { background: #6c757d; height: 45px; order: 4; }
+        .min-edit-input { width: 60px !important; display: inline-block; padding: 4px; font-size: 12px; margin: 0; height: auto; }
 
         .search-area { background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid var(--primary); margin-bottom: 20px; }
-
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
-        .modal-content { background: var(--card); margin: 15% auto; padding: 20px; border-radius: 12px; width: 85%; max-width: 400px; }
+        .modal-content { background: var(--card); margin: 10% auto; padding: 20px; border-radius: 12px; width: 85%; max-width: 450px; border: 1px solid var(--primary); }
     </style>
 </head>
 <body>
@@ -61,48 +52,46 @@
     </button>
 
     <div class="section">
-        <h3>🏠 Neues Lager hinzufügen</h3>
+        <h3>🏠 Lager & Artikel Verwaltung</h3>
         <div class="grid">
-            <input type="text" id="new-wh-name" placeholder="Name (z.B. Werkstatt)">
-            <button onclick="addWarehouse()" style="background:#444; color:white;">+ Erstellen</button>
+            <input type="text" id="new-wh-name" placeholder="Neues Lager (z.B. Auto Michael)">
+            <button onclick="addWarehouse()" style="background:#444; color:white;">Lager anlegen</button>
         </div>
-    </div>
-
-    <div class="section">
-        <h3>✨ Artikel hinzufügen</h3>
-        <input type="text" id="name" placeholder="Bezeichnung (z.B. Schrauben M8)">
+        <hr style="border:0; border-top:1px solid #444; margin:15px 0;">
+        <input type="text" id="name" placeholder="Artikelbezeichnung">
         <div class="grid">
-            <div><label>Preis €/Stk</label><input type="number" id="price" step="0.01" placeholder="0.50"></div>
-            <div><label>Bestand</label><input type="number" id="stock" placeholder="100"></div>
-            <div><label>Warnwert</label><input type="number" id="min" placeholder="10"></div>
+            <div><label>Preis €</label><input type="number" id="price" step="0.01"></div>
+            <div><label>Bestand</label><input type="number" id="stock"></div>
+            <div><label>Warnwert</label><input type="number" id="min"></div>
         </div>
-        <button class="btn-add" onclick="addItem()">In "${currentWH}" speichern</button>
+        <button class="btn-add" onclick="addItem()" id="add-btn-text">In Aktuelles Lager speichern</button>
     </div>
 
     <div class="search-area">
-        <label style="color:var(--primary)">Lagerübergreifende Suche</label>
-        <input type="text" id="search" placeholder="🔍 Alle Lager durchsuchen..." onkeyup="render()">
+        <input type="text" id="search" placeholder="🔍 Artikel suchen (Lagerübergreifend)..." onkeyup="render()">
     </div>
 
     <div id="inventory-list"></div>
 </div>
 
-<div id="moveModal" class="modal">
+<div id="shoppingModal" class="modal">
     <div class="modal-content">
-        <h3>✈️ Umlagern</h3>
-        <p id="move-info"></p>
-        <select id="target-warehouse"></select>
-        <input type="number" id="move-qty" value="1">
-        <button class="btn-add" onclick="executeMove()">Verschieben</button>
-        <button onclick="closeModal('moveModal')" style="background:none; color:white; margin-top:10px; width:100%;">Abbrechen</button>
+        <h3 style="color:var(--primary); border-bottom:1px solid #444">🛒 Bestellbedarf (Zusammengefasst)</h3>
+        <div id="shopping-list-content" style="max-height:400px; overflow-y:auto; margin-top:10px;"></div>
+        <button onclick="closeModal('shoppingModal')" style="background:var(--primary); color:white; width:100%; padding:12px; margin-top:15px; border-radius:8px;">Schließen</button>
     </div>
 </div>
 
-<div id="shoppingModal" class="modal">
+<div id="moveModal" class="modal">
     <div class="modal-content">
-        <h3>🛒 Einkaufsliste</h3>
-        <div id="shopping-list-content" style="max-height:300px; overflow-y:auto;"></div>
-        <button onclick="closeModal('shoppingModal')" style="background:var(--primary); color:white; width:100%; padding:10px; margin-top:10px;">Schließen</button>
+        <h3>✈️ Umlagern</h3>
+        <p id="move-info" style="font-size:14px; color:#aaa;"></p>
+        <label>Ziel-Lager:</label>
+        <select id="target-warehouse"></select>
+        <label>Menge:</label>
+        <input type="number" id="move-qty" value="1">
+        <button class="btn-add" onclick="executeMove()">Verschieben</button>
+        <button onclick="closeModal('moveModal')" style="background:none; color:white; margin-top:10px; width:100%;">Abbrechen</button>
     </div>
 </div>
 
@@ -130,6 +119,11 @@
         }
     }
 
+    function updateMin(wh, idx, val) {
+        db[wh][idx].min = parseInt(val) || 0;
+        save();
+    }
+
     function handleQty(wh, idx, isPlus) {
         const input = document.getElementById(`qty-input-${wh}-${idx}`);
         const change = parseInt(input.value) || 1;
@@ -145,29 +139,22 @@
             const div = document.createElement('div');
             div.className = `warehouse-tab ${wh === currentWH ? 'active' : ''}`;
             div.innerText = wh;
-            div.onclick = () => { currentWH = wh; document.getElementById('search').value = ''; render(); };
+            div.onclick = () => { currentWH = wh; render(); };
             tabs.appendChild(div);
         });
+        document.getElementById('add-btn-text').innerText = `In "${currentWH}" speichern`;
 
         const list = document.getElementById('inventory-list');
         const searchTerm = document.getElementById('search').value.toLowerCase();
         list.innerHTML = '';
-        
         let lowCount = 0;
-        
-        // Lagerübergreifende Logik
+
         Object.keys(db).forEach(wh => {
             db[wh].forEach((item, idx) => {
                 if(item.stock <= item.min) lowCount++;
-                
-                // Falls Suche aktiv ist, zeige Treffer aus allen Lagern
-                // Falls Suche leer ist, zeige nur aktuelles Lager
                 const isSearchActive = searchTerm.length > 0;
-                if(isSearchActive) {
-                    if(!item.name.toLowerCase().includes(searchTerm)) return;
-                } else {
-                    if(wh !== currentWH) return;
-                }
+                if(isSearchActive) { if(!item.name.toLowerCase().includes(searchTerm)) return; } 
+                else { if(wh !== currentWH) return; }
 
                 const isLow = item.stock <= item.min;
                 const div = document.createElement('div');
@@ -175,19 +162,22 @@
                 div.innerHTML = `
                     ${isSearchActive ? `<span class="location-badge">${wh}</span>` : ''}
                     <div class="item-header">
-                        <strong style="font-size:16px;">${item.name}</strong><br>
-                        <small style="color:#aaa">${item.price.toFixed(2)}€/Stk | Wert: ${(item.stock*item.price).toFixed(2)}€</small>
+                        <strong>${item.name}</strong><br>
+                        <small style="color:#aaa">${item.price.toFixed(2)}€/Stk</small>
                     </div>
-                    <div style="margin-bottom:10px; font-weight:bold; font-size:18px;">
-                        Bestand: ${item.stock} <small style="font-weight:normal; font-size:11px; color:#888;">(Min: ${item.min})</small>
+                    <div style="margin-bottom:10px;">
+                        <span style="font-size:18px; font-weight:bold;">Bestand: ${item.stock}</span>
+                        <div style="float:right; font-size:11px; color:#888;">
+                            Warnwert: <input type="number" class="min-edit-input" value="${item.min}" onchange="updateMin('${wh}', ${idx}, this.value)">
+                        </div>
                     </div>
                     <div class="item-controls">
-                        <button class="btn-qty plus" onclick="handleQty('${wh}', ${idx}, true)">+</button>
+                        <button style="background:var(--primary)" class="qty-input" onclick="handleQty('${wh}', ${idx}, true)">+</button>
                         <input type="number" id="qty-input-${wh}-${idx}" class="qty-input" placeholder="Anz.">
-                        <button class="btn-qty minus" onclick="handleQty('${wh}', ${idx}, false)">-</button>
-                        <button class="move-btn" onclick="openMove('${wh}', ${idx})">✈️</button>
+                        <button style="background:var(--danger)" class="qty-input" onclick="handleQty('${wh}', ${idx}, false)">-</button>
+                        <button style="background:#6c757d" class="qty-input" onclick="openMove('${wh}', ${idx})">✈️</button>
                     </div>
-                    <button onclick="deleteItem('${wh}', ${idx})" style="background:none; color:#555; width:100%; font-size:10px; margin-top:12px; border-top:1px solid #333; padding-top:5px;">🗑️ Artikel löschen</button>
+                    <button onclick="deleteItem('${wh}', ${idx})" style="background:none; color:#555; width:100%; font-size:10px; margin-top:10px; border-top:1px solid #333; padding-top:5px;">Löschen</button>
                 `;
                 list.appendChild(div);
             });
@@ -195,10 +185,49 @@
         document.getElementById('low-count-badge').innerText = lowCount;
     }
 
+    function openShoppingList() {
+        const content = document.getElementById('shopping-list-content');
+        content.innerHTML = '';
+        let summary = {};
+
+        // Artikel zusammenfassen
+        Object.keys(db).forEach(wh => {
+            db[wh].forEach(i => {
+                if(i.stock <= i.min) {
+                    if(!summary[i.name]) summary[i.name] = { totalNeed: 0, details: [] };
+                    let missing = i.min - i.stock;
+                    // Falls Bestand exakt auf Min, trotzdem 1 vorschlagen oder einfach nur anzeigen
+                    if(missing <= 0) missing = 1; 
+                    summary[i.name].totalNeed += missing;
+                    summary[i.name].details.push({ wh: wh, stock: i.stock, min: i.min });
+                }
+            });
+        });
+
+        const entries = Object.entries(summary);
+        if(entries.length === 0) {
+            content.innerHTML = "<p style='text-align:center; color:#888;'>Alles ausreichend auf Lager!</p>";
+        } else {
+            entries.forEach(([name, data]) => {
+                let detailText = data.details.map(d => `${d.wh}: ${d.stock}/${d.min}`).join(", ");
+                content.innerHTML += `
+                    <div style="background:#1a1a1a; padding:12px; border-radius:8px; margin-bottom:10px; border-left:4px solid var(--danger);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <strong style="font-size:16px;">${name}</strong>
+                            <span style="background:var(--danger); padding:4px 10px; border-radius:5px; font-weight:bold;">+ ${data.totalNeed} Stk.</span>
+                        </div>
+                        <div style="font-size:11px; color:#777; margin-top:5px;">Bedarf in: ${detailText}</div>
+                    </div>`;
+            });
+        }
+        document.getElementById('shoppingModal').style.display = 'block';
+    }
+
+    // Modal & Move Logik bleibt gleich wie im funktionierenden Vorher-Code
     function openMove(wh, idx) {
         moveTarget = { itemIdx: idx, fromWH: wh };
         const item = db[wh][idx];
-        document.getElementById('move-info').innerText = `${item.name} von ${wh} verschieben:`;
+        document.getElementById('move-info').innerText = `${item.name} aus ${wh} verschieben:`;
         const select = document.getElementById('target-warehouse');
         select.innerHTML = '';
         Object.keys(db).forEach(name => { if(name !== wh) select.options.add(new Option(name, name)); });
@@ -217,19 +246,8 @@
         }
     }
 
-    function deleteItem(wh, idx) { if(confirm("Löschen?")) { db[wh].splice(idx, 1); save(); } }
-    function openShoppingList() {
-        const content = document.getElementById('shopping-list-content');
-        content.innerHTML = '';
-        Object.keys(db).forEach(wh => {
-            db[wh].forEach(i => {
-                if(i.stock <= i.min) content.innerHTML += `<div style="padding:10px; border-bottom:1px solid #444;"><strong>${i.name}</strong> (${wh})<br>Bestand: ${i.stock} | Min: ${i.min}</div>`;
-            });
-        });
-        document.getElementById('shoppingModal').style.display = 'block';
-    }
+    function deleteItem(wh, idx) { if(confirm("Wirklich löschen?")) { db[wh].splice(idx, 1); save(); } }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
     window.onload = render;
 </script>
 </body>
