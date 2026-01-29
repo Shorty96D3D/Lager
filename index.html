@@ -29,35 +29,31 @@ label { display: block; margin-top: 10px; font-size: 10px; color: #aaa; text-tra
 input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid var(--border); border-radius: 8px; background: #121217; color: white; font-size: 15px; box-sizing: border-box; transition: border 0.3s; }
 input:focus { border-color: var(--primary); outline: none; }
 
-/* Lager-Optionen Layout */
 .wh-grid { display: grid; grid-template-columns: 1fr 40px 100px; gap: 10px; align-items: center; }
 input[type="color"] { width: 40px; height: 40px; border: 2px solid var(--border); border-radius: 50%; background: none; cursor: pointer; padding: 0; overflow: hidden; -webkit-appearance: none; margin-top: 0; }
-input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
 
 .warehouse-nav { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 20px; scrollbar-width: none; }
 .warehouse-tab { background: #2a2a33; padding: 10px 18px; border-radius: 25px; white-space: nowrap; cursor: pointer; font-size: 13px; border: 1px solid transparent; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
 .warehouse-tab.active { border-color: var(--primary); background: #333340; box-shadow: 0 0 10px rgba(0,123,255,0.2); }
 .color-dot { width: 12px; height: 12px; border-radius: 50%; }
 
-/* Artikel Karte */
 .inventory-item { background: #23232a; margin-bottom: 15px; padding: 15px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
 
 .stock-container { position: relative; width: 100%; height: 40px; background: #121217; border-radius: 8px; margin: 15px 0; overflow: hidden; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
 .stock-bar { position: absolute; left: 0; top: 0; height: 100%; transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1; }
 .stock-text { position: relative; font-weight: bold; font-size: 16px; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.8); z-index: 5; pointer-events: none; }
 
-/* Controls Grid */
 .item-controls { display: grid; grid-template-columns: 1fr 1.2fr 1fr 0.6fr 0.6fr; gap: 8px; align-items: center; }
 .btn-action { height: 45px; font-size: 20px; color: white; border-radius: 8px; border: none; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
-.btn-action:active { opacity: 0.7; }
 .qty-input-field { height: 45px; margin-top: 0; text-align: center; font-weight: bold; border-color: var(--border); }
 
-.btn-delete-item { background: #331a1a; color: var(--danger); font-size: 16px; border: 1px solid #552222; }
+/* Verkleinerter Lager-Lösch-Button */
+.delete-wh-btn { background: #2a1515; color: #a55; border: 1px solid #442222; padding: 6px 12px; border-radius: 6px; font-size: 10px; cursor: pointer; transition: 0.2s; }
+.delete-wh-btn:hover { background: var(--danger); color: white; }
 
-.delete-wh-btn { background: #331a1a; color: var(--danger); border: 1px solid #552222; width: 100px; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; }
+/* Mini-Input für Warnwert */
+.min-edit-input { width: 45px !important; padding: 4px !important; font-size: 11px !important; margin: 0 !important; display: inline-block; text-align: center; height: auto !important; border-radius: 4px !important; background: #000 !important; border-color: #444 !important; color: var(--warning) !important; }
 
-/* Modals */
 .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(4px); }
 .modal-content { background: var(--card); margin: 15% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; border: 1px solid var(--primary); text-align: center; }
 .btn-modal { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
@@ -137,16 +133,21 @@ db[document.getElementById('select-target-wh').value].items.push(tempItem);
 closeModal('saveModal'); save();
 }
 
+function updateMin(wh, idx, val) {
+db[wh].items[idx].min = parseInt(val) || 0;
+localStorage.setItem('d3d_storage_v6', JSON.stringify(db));
+updateBadge();
+// Wir rendern hier nicht komplett neu, um den Fokus beim Tippen nicht zu verlieren,
+// aber die Badge und Logik im Hintergrund passt sich an.
+}
+
 function deleteCurrentWarehouse() {
 if (Object.keys(db).length <= 1) return alert("Letztes Lager kann nicht gelöscht werden.");
-if (confirm(`Lager "${currentWH}" wirklich unwiderruflich löschen?`)) { delete db[currentWH]; currentWH = Object.keys(db)[0]; save(); }
+if (confirm(`Lager "${currentWH}" wirklich löschen?`)) { delete db[currentWH]; currentWH = Object.keys(db)[0]; save(); }
 }
 
 function deleteItem(wh, idx) {
-if (confirm(`Artikel "${db[wh].items[idx].name}" wirklich komplett löschen?`)) {
-db[wh].items.splice(idx, 1);
-save();
-}
+if (confirm(`Artikel "${db[wh].items[idx].name}" wirklich löschen?`)) { db[wh].items.splice(idx, 1); save(); }
 }
 
 function handleQty(wh, idx, isPlus) {
@@ -168,7 +169,7 @@ div.onclick = () => { currentWH = wh; render(); };
 tabs.appendChild(div);
 });
 
-document.getElementById('delete-wh-section').innerHTML = `<button onclick="deleteCurrentWarehouse()" class="delete-wh-btn">🗑️ "${currentWH}" löschen</button>`;
+document.getElementById('delete-wh-section').innerHTML = `<button onclick="deleteCurrentWarehouse()" class="delete-wh-btn">🗑 Lager löschen</button>`;
 
 const list = document.getElementById('inventory-list');
 const searchTerm = document.getElementById('search').value.toLowerCase();
@@ -193,8 +194,9 @@ div.innerHTML = `
 <strong style="font-size:16px;">${item.name}</strong><br>
 <small style="color:#888;">${wh} | ${item.price.toFixed(2)}€</small>
 </div>
-<div style="text-align:right;">
-<span style="font-size:10px; color:#aaa; font-weight:bold;">MIN: ${item.min}</span>
+<div style="text-align:right; display: flex; flex-direction: column; align-items: flex-end;">
+<span style="font-size:9px; color:#aaa; font-weight:bold; margin-bottom:2px;">MIN-LIMIT</span>
+<input type="number" class="min-edit-input" value="${item.min}" onchange="updateMin('${wh}', ${idx}, this.value)">
 </div>
 </div>
 
@@ -208,7 +210,7 @@ div.innerHTML = `
 <input type="number" id="qty-input-${wh}-${idx}" class="qty-input-field" value="1">
 <button class="btn-action" style="background:var(--danger)" onclick="handleQty('${wh}', ${idx}, false)">-</button>
 <button class="btn-action" style="background:#444" onclick="openMove('${wh}', ${idx})">✈️</button>
-<button class="btn-action btn-delete-item" onclick="deleteItem('${wh}', ${idx})">✕</button>
+<button class="btn-action" style="background:#331a1a; color:var(--danger); border:1px solid #552222; font-size:16px;" onclick="deleteItem('${wh}', ${idx})">✕</button>
 </div>
 `;
 list.appendChild(div);
@@ -224,6 +226,7 @@ document.getElementById('low-count-badge').innerText = low;
 }
 
 function openShoppingList() {
+render(); // Sicherstellen, dass Min-Werte aktuell sind
 const content = document.getElementById('shopping-list-content');
 content.innerHTML = '';
 Object.keys(db).forEach(wh => db[wh].items.forEach(i => {
@@ -258,9 +261,7 @@ item.stock -= qty;
 let existing = db[target].items.find(i => i.name === item.name);
 if(existing) existing.stock += qty; else db[target].items.push({...item, stock: qty});
 closeModal('moveModal'); save();
-} else {
-alert("Nicht genügend Bestand oder ungültige Anzahl!");
-}
+} else { alert("Nicht genügend Bestand!"); }
 }
 
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
