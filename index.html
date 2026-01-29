@@ -1,280 +1,292 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lager-Manager AUE Elektro</title>
-<style>
-:root {
---primary: #007bff;
---success: #28a745;
---danger: #ff4444;
---warning: #ff8800;
---bg: #0f0f12;
---card: #1c1c21;
---section: #25252b;
---text: #f0f0f0;
---border: #33333d;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lager-Manager Pro Elite</title>
+    <style>
+        :root { 
+            --primary: #007bff; 
+            --success: #28a745; 
+            --danger: #ff4444; 
+            --warning: #ff8800; 
+            --bg: #0f0f12; 
+            --card: #1c1c21; 
+            --section: #25252b;
+            --text: #f0f0f0; 
+            --border: #33333d;
+        }
+        
+        body { font-family: 'Segoe UI', Roboto, sans-serif; padding: 10px; background: var(--bg); color: var(--text); line-height: 1.5; margin: 0; padding-bottom: 60px; }
+        
+        .card { background: var(--card); padding: 20px; border-radius: 16px; max-width: 600px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border); }
+        h2 { color: var(--success); text-align: center; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 1px; font-size: 22px; }
+        
+        .section { background: var(--section); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); }
+        h3 { font-size: 12px; margin: 0 0 12px 0; color: #00d4ff; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 6px; letter-spacing: 0.5px; }
 
-body { font-family: 'Segoe UI', Roboto, sans-serif; padding: 10px; background: var(--bg); color: var(--text); line-height: 1.5; margin: 0; padding-bottom: 60px; }
+        label { display: block; margin-top: 10px; font-size: 10px; color: #aaa; text-transform: uppercase; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid var(--border); border-radius: 8px; background: #121217; color: white; font-size: 15px; box-sizing: border-box; transition: border 0.3s; }
+        input:focus { border-color: var(--primary); outline: none; }
+        
+        .wh-grid { display: grid; grid-template-columns: 1fr 45px 100px; gap: 10px; align-items: center; }
+        
+        .color-picker-wrapper { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid var(--border); position: relative; }
+        input[type="color"] { position: absolute; width: 150%; height: 150%; top: -25%; left: -25%; border: none; padding: 0; cursor: pointer; -webkit-appearance: none; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; }
 
-.card { background: var(--card); padding: 20px; border-radius: 16px; max-width: 600px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border); }
-h2 { color: var(--success); text-align: center; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 1px; font-size: 22px; }
+        .warehouse-nav { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 20px; scrollbar-width: none; }
+        .warehouse-tab { background: #2a2a33; padding: 10px 18px; border-radius: 25px; white-space: nowrap; cursor: pointer; font-size: 13px; border: 1px solid transparent; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .warehouse-tab.active { border-color: var(--primary); background: #333340; box-shadow: 0 0 10px rgba(0,123,255,0.2); }
+        .color-dot { width: 12px; height: 12px; border-radius: 50%; }
 
-.section { background: var(--section); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); }
-h3 { font-size: 12px; margin: 0 0 12px 0; color: #00d4ff; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 6px; letter-spacing: 0.5px; }
+        .inventory-item { background: #23232a; margin-bottom: 15px; padding: 15px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
+        
+        .stock-container { position: relative; width: 100%; height: 40px; background: #121217; border-radius: 8px; margin: 15px 0; overflow: hidden; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+        .stock-bar { position: absolute; left: 0; top: 0; height: 100%; transition: width 0.4s ease, background-color 0.4s ease; z-index: 1; }
+        .stock-text { position: relative; font-weight: bold; font-size: 16px; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.8); z-index: 5; pointer-events: none; }
 
-label { display: block; margin-top: 10px; font-size: 10px; color: #aaa; text-transform: uppercase; font-weight: bold; }
-input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid var(--border); border-radius: 8px; background: #121217; color: white; font-size: 15px; box-sizing: border-box; transition: border 0.3s; }
-input:focus { border-color: var(--primary); outline: none; }
+        /* Neue Button-Struktur */
+        .item-controls { display: grid; grid-template-columns: 1fr 1fr 1fr 0.6fr 0.6fr 0.6fr; gap: 8px; align-items: stretch; }
+        .btn-action { height: 48px; font-size: 18px; color: white; border-radius: 8px; border: none; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
+        .qty-input-field { height: 48px !important; margin-top: 0 !important; text-align: center; font-weight: bold; border-color: var(--border); }
 
-/* Lager hinzufügen Grid */
-.wh-grid { display: grid; grid-template-columns: 1fr 45px 100px; gap: 10px; align-items: center; }
+        .delete-wh-btn { background: #2a1515; color: #cc6666; border: 1px solid #442222; width: 100px; height: 40px; border-radius: 8px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: 0.2s; }
+        .delete-wh-btn:hover { background: var(--danger); color: white; }
 
-/* Runder Farb-Picker Style */
-.color-picker-wrapper { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid var(--border); position: relative; }
-input[type="color"] {
-position: absolute; width: 150%; height: 150%; top: -25%; left: -25%;
-border: none; padding: 0; cursor: pointer; -webkit-appearance: none;
-}
-input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-input[type="color"]::-webkit-color-swatch { border: none; }
+        .min-edit-input { width: 65px !important; padding: 8px !important; font-size: 13px !important; margin: 0 !important; display: inline-block; text-align: center; height: 35px !important; border-radius: 6px !important; background: #000 !important; border: 1px solid var(--warning) !important; color: var(--warning) !important; font-weight: bold; }
 
-.warehouse-nav { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 20px; scrollbar-width: none; }
-.warehouse-tab { background: #2a2a33; padding: 10px 18px; border-radius: 25px; white-space: nowrap; cursor: pointer; font-size: 13px; border: 1px solid transparent; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
-.warehouse-tab.active { border-color: var(--primary); background: #333340; box-shadow: 0 0 10px rgba(0,123,255,0.2); }
-.color-dot { width: 12px; height: 12px; border-radius: 50%; }
-
-.inventory-item { background: #23232a; margin-bottom: 15px; padding: 15px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
-
-.stock-container { position: relative; width: 100%; height: 40px; background: #121217; border-radius: 8px; margin: 15px 0; overflow: hidden; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
-.stock-bar { position: absolute; left: 0; top: 0; height: 100%; transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1; }
-.stock-text { position: relative; font-weight: bold; font-size: 16px; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.8); z-index: 5; pointer-events: none; }
-
-.item-controls { display: grid; grid-template-columns: 1fr 1.2fr 1fr 0.6fr 0.6fr; gap: 8px; align-items: center; }
-.btn-action { height: 45px; font-size: 20px; color: white; border-radius: 8px; border: none; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
-.qty-input-field { height: 45px; margin-top: 0; text-align: center; font-weight: bold; border-color: var(--border); }
-
-/* Lager löschen Button mit Mülltonne */
-.delete-wh-btn { background: #2a1515; color: #cc6666; border: 1px solid #442222; padding: 8px 14px; border-radius: 8px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
-.delete-wh-btn:hover { background: var(--danger); color: white; }
-
-/* Optimierter Warnwert Input */
-.min-edit-input { width: 60px !important; padding: 8px !important; font-size: 13px !important; margin: 0 !important; display: inline-block; text-align: center; height: 35px !important; border-radius: 6px !important; background: #000 !important; border: 1px solid var(--warning) !important; color: var(--warning) !important; font-weight: bold; }
-
-.modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(4px); }
-.modal-content { background: var(--card); margin: 15% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; border: 1px solid var(--primary); text-align: center; }
-.btn-modal { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
-</style>
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(4px); }
+        .modal-content { background: var(--card); margin: 15% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; border: 1px solid var(--primary); text-align: center; }
+        .btn-modal { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
+    </style>
 </head>
 <body>
 
 <div class="card">
-<h2>📦 Lager-Manager AUE Elektro</h2>
+    <h2>📦 Lager-Manager Pro</h2>
 
-<div class="warehouse-nav" id="warehouse-tabs"></div>
+    <div class="warehouse-nav" id="warehouse-tabs"></div>
+    
+    <button style="background:var(--primary); color:white; width:100%; padding:14px; margin-bottom:20px; border-radius:12px; font-size: 16px; font-weight: bold; border:none; cursor:pointer;" onclick="openShoppingList()">
+        🛒 Einkaufsliste <span id="low-count-badge" style="background:var(--danger); padding:2px 10px; border-radius:10px; margin-left:8px; font-size: 12px;">0</span>
+    </button>
 
-<button style="background:var(--primary); color:white; width:100%; padding:14px; margin-bottom:20px; border-radius:12px; font-size: 16px; font-weight: bold; border:none; cursor:pointer;" onclick="openShoppingList()">
-🛒 Einkaufsliste <span id="low-count-badge" style="background:var(--danger); padding:2px 10px; border-radius:10px; margin-left:8px; font-size: 12px;">0</span>
-</button>
+    <div class="section">
+        <h3>🏠 Artikel neu anlegen</h3>
+        <input type="text" id="name" placeholder="Bezeichnung (z.B. Rauchmelder)">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div><label>Preis €</label><input type="number" id="price" step="0.01" placeholder="0.00"></div>
+            <div><label>Bestand</label><input type="number" id="stock" placeholder="0"></div>
+        </div>
+        <label>Warnwert (Min)</label>
+        <input type="number" id="min" placeholder="5">
+        <button onclick="preSaveItem()" style="background:var(--success); color:white; width:100%; padding:14px; margin-top:15px; border-radius:12px; font-size:15px; font-weight: bold; border:none; cursor:pointer;">💾 Artikel speichern...</button>
+    </div>
 
-<div class="section">
-<h3>🏠 Artikel neu anlegen</h3>
-<input type="text" id="name" placeholder="Bezeichnung (z.B. Rauchmelder)">
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-<div><label>Preis €</label><input type="number" id="price" step="0.01" placeholder="0.00"></div>
-<div><label>Bestand</label><input type="number" id="stock" placeholder="0"></div>
-</div>
-<label>Warnung bei... (Min)</label>
-<input type="number" id="min" placeholder="5">
-<button onclick="preSaveItem()" style="background:var(--success); color:white; width:100%; padding:14px; margin-top:15px; border-radius:12px; font-size:15px; font-weight: bold; border:none; cursor:pointer;">💾 Artikel speichern...</button>
-</div>
+    <div class="section">
+        <h3>➕ Lager hinzufügen</h3>
+        <div class="wh-grid">
+            <input type="text" id="new-wh-name" placeholder="Name Lager...">
+            <div class="color-picker-wrapper">
+                <input type="color" id="new-wh-color" value="#007bff">
+            </div>
+            <button onclick="addWarehouse()" style="background:var(--success); color:white; height: 40px; width:100px; border-radius: 8px; font-weight: bold; border: none; font-size: 13px; cursor:pointer;">+ Lager</button>
+        </div>
+        <div style="margin-top: 15px; display: flex; justify-content: flex-end;" id="delete-wh-section"></div>
+    </div>
 
-<div class="section">
-<h3>➕ Lager hinzufügen</h3>
-<div class="wh-grid">
-<input type="text" id="new-wh-name" placeholder="Name Lager...">
-<div class="color-picker-wrapper">
-<input type="color" id="new-wh-color" value="#007bff">
-</div>
-<button onclick="addWarehouse()" style="background:var(--success); color:white; height: 40px; border-radius: 8px; font-weight: bold; border: none; font-size: 13px; cursor:pointer;">+ Lager</button>
-</div>
-<div style="margin-top: 15px; display: flex; justify-content: flex-end;" id="delete-wh-section"></div>
-</div>
+    <div style="margin: 25px 0;">
+        <input type="text" id="search" style="border: 1px solid var(--primary); background: #121217;" placeholder="🔍 Global suchen..." onkeyup="render()">
+    </div>
 
-<div style="margin: 25px 0;">
-<input type="text" id="search" style="border: 1px solid var(--primary); background: #121217;" placeholder="🔍 Global suchen..." onkeyup="render()">
-</div>
-
-<div id="inventory-list"></div>
+    <div id="inventory-list"></div>
 </div>
 
+<div id="editModal" class="modal"><div class="modal-content"><h3>✏️ Artikel bearbeiten</h3><label>Bezeichnung</label><input type="text" id="edit-name"><label>Preis €</label><input type="number" id="edit-price" step="0.01"><button class="btn-modal" style="background:var(--success); color:white;" onclick="confirmEditItem()">Speichern</button><button class="btn-modal" style="background:#444; color:white;" onclick="closeModal('editModal')">Abbrechen</button></div></div>
 <div id="saveModal" class="modal"><div class="modal-content"><h3>📍 Ziel-Lager wählen</h3><select id="select-target-wh"></select><button class="btn-modal" style="background:var(--success); color:white;" onclick="confirmSaveItem()">Einlagern</button><button class="btn-modal" style="background:#444; color:white;" onclick="closeModal('saveModal')">Abbrechen</button></div></div>
 <div id="shoppingModal" class="modal"><div class="modal-content"><h3>🛒 Bestellliste</h3><div id="shopping-list-content" style="text-align: left; max-height: 300px; overflow-y: auto; margin: 15px 0;"></div><button class="btn-modal" style="background:var(--primary); color:white;" onclick="closeModal('shoppingModal')">Schließen</button></div></div>
 <div id="moveModal" class="modal"><div class="modal-content"><h3>✈️ Umlagern</h3><p id="move-info" style="color:#aaa; font-size:13px;"></p><select id="move-target-wh"></select><input type="number" id="move-qty" value="1" style="margin: 10px 0;"><button class="btn-modal" style="background:var(--success); color:white;" onclick="executeMove()">Verschieben</button><button class="btn-modal" style="background:#444; color:white;" onclick="closeModal('moveModal')">Abbrechen</button></div></div>
 
 <script>
-let db = JSON.parse(localStorage.getItem('d3d_storage_v6')) || { "Hauptlager": { color: "#007bff", items: [] } };
-let currentWH = Object.keys(db)[0] || "Hauptlager";
-let tempItem = null;
-let moveTargetData = { itemIdx: null, fromWH: '' };
+    let db = JSON.parse(localStorage.getItem('d3d_storage_v6')) || { "Hauptlager": { color: "#007bff", items: [] } };
+    let currentWH = Object.keys(db)[0] || "Hauptlager";
+    let tempItem = null;
+    let editTarget = { wh: '', idx: null };
+    let moveTargetData = { itemIdx: null, fromWH: '' };
 
-function save() { localStorage.setItem('d3d_storage_v6', JSON.stringify(db)); render(); }
+    function save() { localStorage.setItem('d3d_storage_v6', JSON.stringify(db)); render(); }
 
-function addWarehouse() {
-const name = document.getElementById('new-wh-name').value.trim();
-const color = document.getElementById('new-wh-color').value;
-if(name && !db[name]) { db[name] = { color: color, items: [] }; currentWH = name; document.getElementById('new-wh-name').value = ''; save(); }
-}
+    function addWarehouse() {
+        const name = document.getElementById('new-wh-name').value.trim();
+        const color = document.getElementById('new-wh-color').value;
+        if(name && !db[name]) { db[name] = { color: color, items: [] }; currentWH = name; document.getElementById('new-wh-name').value = ''; save(); }
+    }
 
-function preSaveItem() {
-const name = document.getElementById('name').value;
-if(!name) return alert("Bezeichnung fehlt!");
-tempItem = { name, price: parseFloat(document.getElementById('price').value) || 0, stock: parseInt(document.getElementById('stock').value) || 0, min: parseInt(document.getElementById('min').value) || 0 };
-const select = document.getElementById('select-target-wh');
-select.innerHTML = '';
-Object.keys(db).forEach(wh => select.options.add(new Option(wh, wh, wh === currentWH, wh === currentWH)));
-document.getElementById('saveModal').style.display = 'block';
-}
+    function preSaveItem() {
+        const name = document.getElementById('name').value;
+        if(!name) return alert("Bezeichnung fehlt!");
+        tempItem = { name, price: parseFloat(document.getElementById('price').value) || 0, stock: parseInt(document.getElementById('stock').value) || 0, min: parseInt(document.getElementById('min').value) || 0 };
+        const select = document.getElementById('select-target-wh');
+        select.innerHTML = '';
+        Object.keys(db).forEach(wh => select.options.add(new Option(wh, wh, wh === currentWH, wh === currentWH)));
+        document.getElementById('saveModal').style.display = 'block';
+    }
 
-function confirmSaveItem() {
-db[document.getElementById('select-target-wh').value].items.push(tempItem);
-["name", "price", "stock", "min"].forEach(id => document.getElementById(id).value = '');
-closeModal('saveModal'); save();
-}
+    function confirmSaveItem() {
+        db[document.getElementById('select-target-wh').value].items.push(tempItem);
+        ["name", "price", "stock", "min"].forEach(id => document.getElementById(id).value = '');
+        closeModal('saveModal'); save();
+    }
 
-function updateMin(wh, idx, val) {
-db[wh].items[idx].min = parseInt(val) || 0;
-localStorage.setItem('d3d_storage_v6', JSON.stringify(db));
-updateBadge();
-}
+    function updateMin(wh, idx, val) {
+        db[wh].items[idx].min = parseInt(val) || 0;
+        localStorage.setItem('d3d_storage_v6', JSON.stringify(db));
+        render(); // Komplettes Render erzwingt Farb-Update des Balkens
+    }
 
-function deleteCurrentWarehouse() {
-if (Object.keys(db).length <= 1) return alert("Letztes Lager kann nicht gelöscht werden.");
-if (confirm(`Lager "${currentWH}" wirklich löschen?`)) { delete db[currentWH]; currentWH = Object.keys(db)[0]; save(); }
-}
+    function openEditItem(wh, idx) {
+        editTarget = { wh, idx };
+        const item = db[wh].items[idx];
+        document.getElementById('edit-name').value = item.name;
+        document.getElementById('edit-price').value = item.price;
+        document.getElementById('editModal').style.display = 'block';
+    }
 
-function deleteItem(wh, idx) {
-if (confirm(`Artikel "${db[wh].items[idx].name}" wirklich löschen?`)) { db[wh].items.splice(idx, 1); save(); }
-}
+    function confirmEditItem() {
+        const item = db[editTarget.wh].items[editTarget.idx];
+        item.name = document.getElementById('edit-name').value;
+        item.price = parseFloat(document.getElementById('edit-price').value) || 0;
+        closeModal('editModal'); save();
+    }
 
-function handleQty(wh, idx, isPlus) {
-const input = document.getElementById(`qty-input-${wh}-${idx}`);
-const change = parseInt(input.value) || 1;
-let item = db[wh].items[idx];
-item.stock = isPlus ? item.stock + change : Math.max(0, item.stock - change);
-save();
-}
+    function deleteCurrentWarehouse() {
+        if (Object.keys(db).length <= 1) return alert("Letztes Lager kann nicht gelöscht werden.");
+        if (confirm(`Lager "${currentWH}" wirklich löschen?`)) { delete db[currentWH]; currentWH = Object.keys(db)[0]; save(); }
+    }
 
-function render() {
-const tabs = document.getElementById('warehouse-tabs');
-tabs.innerHTML = '';
-Object.keys(db).forEach(wh => {
-const div = document.createElement('div');
-div.className = `warehouse-tab ${wh === currentWH ? 'active' : ''}`;
-div.innerHTML = `<span class="color-dot" style="background:${db[wh].color}"></span> ${wh}`;
-div.onclick = () => { currentWH = wh; render(); };
-tabs.appendChild(div);
-});
+    function deleteItem(wh, idx) {
+        if (confirm(`Artikel "${db[wh].items[idx].name}" wirklich löschen?`)) { db[wh].items.splice(idx, 1); save(); }
+    }
 
-document.getElementById('delete-wh-section').innerHTML = `<button onclick="deleteCurrentWarehouse()" class="delete-wh-btn">🗑️ Lager löschen</button>`;
+    function handleQty(wh, idx, isPlus) {
+        const input = document.getElementById(`qty-input-${wh}-${idx}`);
+        const change = parseInt(input.value) || 1;
+        let item = db[wh].items[idx];
+        item.stock = isPlus ? item.stock + change : Math.max(0, item.stock - change);
+        save();
+    }
 
-const list = document.getElementById('inventory-list');
-const searchTerm = document.getElementById('search').value.toLowerCase();
-list.innerHTML = '';
+    function render() {
+        const tabs = document.getElementById('warehouse-tabs');
+        tabs.innerHTML = '';
+        Object.keys(db).forEach(wh => {
+            const div = document.createElement('div');
+            div.className = `warehouse-tab ${wh === currentWH ? 'active' : ''}`;
+            div.innerHTML = `<span class="color-dot" style="background:${db[wh].color}"></span> ${wh}`;
+            div.onclick = () => { currentWH = wh; render(); };
+            tabs.appendChild(div);
+        });
 
-Object.keys(db).forEach(wh => {
-db[wh].items.forEach((item, idx) => {
-if(searchTerm && !item.name.toLowerCase().includes(searchTerm)) return;
-if(!searchTerm && wh !== currentWH) return;
+        document.getElementById('delete-wh-section').innerHTML = `<button onclick="deleteCurrentWarehouse()" class="delete-wh-btn">🗑️ Lager löschen</button>`;
 
-let barColor = 'var(--success)';
-let percent = (item.stock / (item.min * 2)) * 100;
-if (item.stock <= item.min) barColor = 'var(--danger)';
-else if (item.stock <= item.min * 1.5) barColor = 'var(--warning)';
+        const list = document.getElementById('inventory-list');
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        list.innerHTML = '';
 
-const div = document.createElement('div');
-div.className = `inventory-item`;
-div.style.borderLeft = `4px solid ${item.stock <= item.min ? 'var(--danger)' : '#444'}`;
-div.innerHTML = `
-<div style="display:flex; justify-content:space-between; align-items:flex-start;">
-<div>
-<strong style="font-size:16px;">${item.name}</strong><br>
-<small style="color:#888;">${wh} | ${item.price.toFixed(2)}€</small>
-</div>
-<div style="text-align:right; display: flex; flex-direction: column; align-items: flex-end;">
-<span style="font-size:9px; color:#aaa; font-weight:bold; margin-bottom:4px;">MIN-LIMIT</span>
-<input type="number" class="min-edit-input" value="${item.min}" onchange="updateMin('${wh}', ${idx}, this.value)">
-</div>
-</div>
+        Object.keys(db).forEach(wh => {
+            db[wh].items.forEach((item, idx) => {
+                if(searchTerm && !item.name.toLowerCase().includes(searchTerm)) return;
+                if(!searchTerm && wh !== currentWH) return;
 
-<div class="stock-container">
-<div class="stock-bar" style="width: ${Math.min(100, percent)}%; background-color: ${barColor};"></div>
-<div class="stock-text">${item.stock} Stück</div>
-</div>
+                let barColor = 'var(--success)';
+                let percent = (item.stock / (item.min * 2)) * 100;
+                if (item.stock <= item.min) barColor = 'var(--danger)';
+                else if (item.stock <= item.min * 1.5) barColor = 'var(--warning)';
 
-<div class="item-controls">
-<button class="btn-action" style="background:var(--primary)" onclick="handleQty('${wh}', ${idx}, true)">+</button>
-<input type="number" id="qty-input-${wh}-${idx}" class="qty-input-field" value="1">
-<button class="btn-action" style="background:var(--danger)" onclick="handleQty('${wh}', ${idx}, false)">-</button>
-<button class="btn-action" style="background:#444" onclick="openMove('${wh}', ${idx})">✈️</button>
-<button class="btn-action" style="background:#331a1a; color:var(--danger); border:1px solid #552222; font-size:16px;" onclick="deleteItem('${wh}', ${idx})">✕</button>
-</div>
-`;
-list.appendChild(div);
-});
-});
-updateBadge();
-}
+                const div = document.createElement('div');
+                div.className = `inventory-item`;
+                div.style.borderLeft = `4px solid ${item.stock <= item.min ? 'var(--danger)' : '#444'}`;
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <strong style="font-size:16px;">${item.name}</strong><br>
+                            <small style="color:#888;">${wh} | ${item.price.toFixed(2)}€</small>
+                        </div>
+                        <div style="text-align:right; display: flex; flex-direction: column; align-items: flex-end;">
+                            <span style="font-size:9px; color:#aaa; font-weight:bold; margin-bottom:4px;">MIN-LIMIT</span>
+                            <input type="number" class="min-edit-input" value="${item.min}" onchange="updateMin('${wh}', ${idx}, this.value)">
+                        </div>
+                    </div>
+                    
+                    <div class="stock-container">
+                        <div class="stock-bar" style="width: ${Math.min(100, percent)}%; background-color: ${barColor};"></div>
+                        <div class="stock-text">${item.stock} Stück</div>
+                    </div>
 
-function updateBadge() {
-let low = 0;
-Object.keys(db).forEach(wh => db[wh].items.forEach(i => { if(i.stock <= i.min) low++; }));
-document.getElementById('low-count-badge').innerText = low;
-}
+                    <div class="item-controls">
+                        <button class="btn-action" style="background:var(--primary)" onclick="handleQty('${wh}', ${idx}, true)">+</button>
+                        <input type="number" id="qty-input-${wh}-${idx}" class="qty-input-field" value="1">
+                        <button class="btn-action" style="background:var(--danger)" onclick="handleQty('${wh}', ${idx}, false)">-</button>
+                        
+                        <button class="btn-action" style="background:#444" onclick="openMove('${wh}', ${idx})">✈️</button>
+                        <button class="btn-action" style="background:#555" onclick="openEditItem('${wh}', ${idx})">⚙️</button>
+                        <button class="btn-action" style="background:#331a1a; color:var(--danger); border:1px solid #552222;" onclick="deleteItem('${wh}', ${idx})">✕</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        });
+        updateBadge();
+    }
 
-function openShoppingList() {
-const content = document.getElementById('shopping-list-content');
-content.innerHTML = '';
-Object.keys(db).forEach(wh => db[wh].items.forEach(i => {
-if(i.stock <= i.min) {
-const diff = i.min - i.stock;
-content.innerHTML += `<div style="background:#2d1a1a; padding:12px; border-radius:10px; margin-bottom:8px; border-left:4px solid var(--danger); display:flex; justify-content:space-between; align-items:center;">
-<div><strong>${i.name}</strong><br><small>${wh}</small></div>
-<div style="color:var(--danger); font-weight:bold;">+ ${diff > 0 ? diff : 1} Stk.</div>
-</div>`;
-}
-}));
-if(!content.innerHTML) content.innerHTML = "<p style='text-align:center; color:#888; margin: 20px 0;'>Alles im grünen Bereich!</p>";
-document.getElementById('shoppingModal').style.display = 'block';
-}
+    function updateBadge() {
+        let low = 0;
+        Object.keys(db).forEach(wh => db[wh].items.forEach(i => { if(i.stock <= i.min) low++; }));
+        document.getElementById('low-count-badge').innerText = low;
+    }
 
-function openMove(wh, idx) {
-moveTargetData = { itemIdx: idx, fromWH: wh };
-const item = db[wh].items[idx];
-document.getElementById('move-info').innerText = `${item.name} von ${wh} verschieben:`;
-const select = document.getElementById('move-target-wh');
-select.innerHTML = '';
-Object.keys(db).forEach(name => { if(name !== wh) select.options.add(new Option(name, name)); });
-document.getElementById('moveModal').style.display = 'block';
-}
+    function openShoppingList() {
+        const content = document.getElementById('shopping-list-content');
+        content.innerHTML = '';
+        Object.keys(db).forEach(wh => db[wh].items.forEach(i => {
+            if(i.stock <= i.min) {
+                const diff = i.min - i.stock;
+                content.innerHTML += `<div style="background:#2d1a1a; padding:12px; border-radius:10px; margin-bottom:8px; border-left:4px solid var(--danger); display:flex; justify-content:space-between; align-items:center;">
+                    <div><strong>${i.name}</strong><br><small>${wh}</small></div>
+                    <div style="color:var(--danger); font-weight:bold;">+ ${diff > 0 ? diff : 1} Stk.</div>
+                </div>`;
+            }
+        }));
+        if(!content.innerHTML) content.innerHTML = "<p style='text-align:center; color:#888; margin: 20px 0;'>Alles im grünen Bereich!</p>";
+        document.getElementById('shoppingModal').style.display = 'block';
+    }
 
-function executeMove() {
-const qty = parseInt(document.getElementById('move-qty').value);
-const target = document.getElementById('move-target-wh').value;
-const item = db[moveTargetData.fromWH].items[moveTargetData.itemIdx];
-if(qty > 0 && item.stock >= qty) {
-item.stock -= qty;
-let existing = db[target].items.find(i => i.name === item.name);
-if(existing) existing.stock += qty; else db[target].items.push({...item, stock: qty});
-closeModal('moveModal'); save();
-} else { alert("Nicht genügend Bestand!"); }
-}
+    function openMove(wh, idx) {
+        moveTargetData = { itemIdx: idx, fromWH: wh };
+        const item = db[wh].items[idx];
+        document.getElementById('move-info').innerText = `${item.name} von ${wh} verschieben:`;
+        const select = document.getElementById('move-target-wh');
+        select.innerHTML = '';
+        Object.keys(db).forEach(name => { if(name !== wh) select.options.add(new Option(name, name)); });
+        document.getElementById('moveModal').style.display = 'block';
+    }
 
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-window.onload = render;
+    function executeMove() {
+        const qty = parseInt(document.getElementById('move-qty').value);
+        const target = document.getElementById('move-target-wh').value;
+        const item = db[moveTargetData.fromWH].items[moveTargetData.itemIdx];
+        if(qty > 0 && item.stock >= qty) {
+            item.stock -= qty;
+            let existing = db[target].items.find(i => i.name === item.name);
+            if(existing) existing.stock += qty; else db[target].items.push({...item, stock: qty});
+            closeModal('moveModal'); save();
+        } else { alert("Nicht genügend Bestand!"); }
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    window.onload = render;
 </script>
 </body>
 </html>
-
