@@ -5,48 +5,62 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lager-Manager Pro Elite</title>
 <style>
-:root { --primary: #007bff; --success: #28a745; --danger: #ff4444; --warning: #ff8800; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; }
-body { font-family: -apple-system, sans-serif; padding: 10px; background: var(--bg); color: var(--text); line-height: 1.4; margin: 0; padding-bottom: 50px; }
+:root {
+--primary: #007bff;
+--success: #28a745;
+--danger: #ff4444;
+--warning: #ff8800;
+--bg: #0f0f12;
+--card: #1c1c21;
+--section: #25252b;
+--text: #f0f0f0;
+--border: #33333d;
+}
 
-.card { background: var(--card); padding: 15px; border-radius: 12px; max-width: 600px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
-h2 { color: var(--success); text-align: center; text-transform: uppercase; margin-bottom: 15px; }
+body { font-family: 'Segoe UI', Roboto, sans-serif; padding: 10px; background: var(--bg); color: var(--text); line-height: 1.5; margin: 0; padding-bottom: 60px; }
 
-.section { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333; }
-h3 { font-size: 13px; margin: 0 0 10px 0; color: #00d4ff; text-transform: uppercase; border-bottom: 1px solid #444; padding-bottom: 5px; }
+.card { background: var(--card); padding: 20px; border-radius: 16px; max-width: 600px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border); }
+h2 { color: var(--success); text-align: center; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 1px; font-size: 22px; }
 
-label { display: block; margin-top: 8px; font-size: 10px; color: #888; text-transform: uppercase; }
-input, select { width: 100%; padding: 12px; margin-top: 4px; border: 1px solid #444; border-radius: 6px; background: #121212; color: white; font-size: 16px; box-sizing: border-box; }
+.section { background: var(--section); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); }
+h3 { font-size: 12px; margin: 0 0 12px 0; color: #00d4ff; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 6px; letter-spacing: 0.5px; }
 
-/* Runde & kleinere Farbauswahl */
-input[type="color"] { width: 35px; height: 35px; border: 2px solid #444; border-radius: 50%; background: none; cursor: pointer; padding: 0; overflow: hidden; -webkit-appearance: none; flex-shrink: 0; }
+label { display: block; margin-top: 10px; font-size: 10px; color: #aaa; text-transform: uppercase; font-weight: bold; }
+input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid var(--border); border-radius: 8px; background: #121217; color: white; font-size: 15px; box-sizing: border-box; transition: border 0.3s; }
+input:focus { border-color: var(--primary); outline: none; }
+
+/* Lager-Optionen Layout */
+.wh-grid { display: grid; grid-template-columns: 1fr 40px 100px; gap: 10px; align-items: center; }
+input[type="color"] { width: 40px; height: 40px; border: 2px solid var(--border); border-radius: 50%; background: none; cursor: pointer; padding: 0; overflow: hidden; -webkit-appearance: none; margin-top: 0; }
 input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
 input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
 
-.warehouse-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none; align-items: center; }
-.warehouse-tab { background: #333; padding: 8px 16px; border-radius: 20px; white-space: nowrap; cursor: pointer; font-size: 13px; border: 2px solid transparent; display: flex; align-items: center; gap: 6px; }
-.warehouse-tab.active { border: 2px solid #ffffff; background: #444; }
+.warehouse-nav { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 20px; scrollbar-width: none; }
+.warehouse-tab { background: #2a2a33; padding: 10px 18px; border-radius: 25px; white-space: nowrap; cursor: pointer; font-size: 13px; border: 1px solid transparent; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+.warehouse-tab.active { border-color: var(--primary); background: #333340; box-shadow: 0 0 10px rgba(0,123,255,0.2); }
+.color-dot { width: 12px; height: 12px; border-radius: 50%; }
 
-.color-dot { width: 10px; height: 10px; border-radius: 50%; }
+/* Artikel Karte */
+.inventory-item { background: #23232a; margin-bottom: 15px; padding: 15px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
 
-.inventory-item { background: #2a2a2a; margin-bottom: 12px; padding: 15px; border-radius: 10px; border-left: 5px solid #444; }
+.stock-container { position: relative; width: 100%; height: 40px; background: #121217; border-radius: 8px; margin: 15px 0; overflow: hidden; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+.stock-bar { position: absolute; left: 0; top: 0; height: 100%; transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1; }
+.stock-text { position: relative; font-weight: bold; font-size: 16px; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.8); z-index: 5; pointer-events: none; }
 
-/* Balken mit perfekt zentriertem Text */
-.stock-container { position: relative; width: 100%; height: 38px; background: #111; border-radius: 10px; margin: 15px 0; overflow: hidden; border: 1px solid #444; display: flex; align-items: center; justify-content: center; }
-.stock-bar { position: absolute; left: 0; top: 0; height: 100%; transition: width 0.5s ease-out, background-color 0.3s; z-index: 1; }
-.stock-text { position: relative; font-weight: bold; font-size: 18px; color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); z-index: 5; pointer-events: none; }
+/* Controls Grid */
+.item-controls { display: grid; grid-template-columns: 1fr 1.2fr 1fr 0.6fr 0.6fr; gap: 8px; align-items: center; }
+.btn-action { height: 45px; font-size: 20px; color: white; border-radius: 8px; border: none; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
+.btn-action:active { opacity: 0.7; }
+.qty-input-field { height: 45px; margin-top: 0; text-align: center; font-weight: bold; border-color: var(--border); }
 
-.item-controls { display: grid; grid-template-columns: 1fr 1.2fr 1fr 0.6fr; gap: 8px; margin-top: 5px; }
-.btn-action { height: 48px; font-size: 22px; color: white; border-radius: 8px; border: none; cursor: pointer; }
+.btn-delete-item { background: #331a1a; color: var(--danger); font-size: 16px; border: 1px solid #552222; }
 
-.min-box { background: #1a1a1a; padding: 5px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid #444; }
-.min-input { width: 45px !important; padding: 2px !important; margin: 0 !important; height: auto !important; text-align: center; border: none !important; background: none !important; color: #00d4ff !important; font-weight: bold; font-size: 14px; }
+.delete-wh-btn { background: #331a1a; color: var(--danger); border: 1px solid #552222; width: 100px; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; }
 
-.modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); }
-.modal-content { background: var(--card); margin: 15% auto; padding: 25px; border-radius: 15px; width: 85%; max-width: 450px; border: 1px solid var(--primary); text-align: center; }
-
-.btn-modal { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
-
-.delete-wh-btn { background: #441111; color: #ff4444; border: 1px solid #882222; width: auto; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; margin-top: 10px; display: inline-block; }
+/* Modals */
+.modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(4px); }
+.modal-content { background: var(--card); margin: 15% auto; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; border: 1px solid var(--primary); text-align: center; }
+.btn-modal { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
 </style>
 </head>
 <body>
@@ -56,66 +70,42 @@ input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
 
 <div class="warehouse-nav" id="warehouse-tabs"></div>
 
-<button style="background:var(--primary); color:white; width:100%; padding:14px; margin-bottom:20px; border-radius:10px; font-size: 16px; font-weight: bold; border:none;" onclick="openShoppingList()">
-🛒 Einkaufsliste <span id="low-count-badge" style="background:var(--danger); padding:2px 10px; border-radius:12px; margin-left:8px;">0</span>
+<button style="background:var(--primary); color:white; width:100%; padding:14px; margin-bottom:20px; border-radius:12px; font-size: 16px; font-weight: bold; border:none; cursor:pointer;" onclick="openShoppingList()">
+🛒 Einkaufsliste <span id="low-count-badge" style="background:var(--danger); padding:2px 10px; border-radius:10px; margin-left:8px; font-size: 12px;">0</span>
 </button>
 
 <div class="section">
 <h3>🏠 Artikel neu anlegen</h3>
-<input type="text" id="name" placeholder="Artikelbezeichnung (z.B. Rauchmelder)">
+<input type="text" id="name" placeholder="Bezeichnung (z.B. Rauchmelder)">
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
 <div><label>Preis €</label><input type="number" id="price" step="0.01" placeholder="0.00"></div>
 <div><label>Bestand</label><input type="number" id="stock" placeholder="0"></div>
 </div>
 <label>Warnwert (Min)</label>
 <input type="number" id="min" placeholder="5">
-<button onclick="preSaveItem()" style="background:var(--success); color:white; width:100%; padding:14px; margin-top:15px; border-radius:10px; font-size:16px; font-weight: bold; border:none;">💾 Artikel speichern...</button>
+<button onclick="preSaveItem()" style="background:var(--success); color:white; width:100%; padding:14px; margin-top:15px; border-radius:12px; font-size:15px; font-weight: bold; border:none; cursor:pointer;">💾 Artikel speichern...</button>
 </div>
 
 <div class="section">
 <h3>⚙️ Lager-Optionen</h3>
-<div style="display: flex; gap: 8px; align-items: center;">
-<input type="text" id="new-wh-name" placeholder="Name..." style="flex: 2; margin-top: 0;">
+<div class="wh-grid">
+<input type="text" id="new-wh-name" placeholder="Name Lager...">
 <input type="color" id="new-wh-color" value="#007bff">
-<button onclick="addWarehouse()" style="background:var(--success); color:white; height: 48px; flex: 1.2; border-radius: 8px; font-weight: bold; border: none; font-size: 16px;">+ Lager</button>
+<button onclick="addWarehouse()" style="background:var(--success); color:white; height: 40px; border-radius: 8px; font-weight: bold; border: none; font-size: 13px; cursor:pointer;">+ Lager</button>
 </div>
-<div id="delete-wh-section" style="text-align: right;"></div>
+<div style="margin-top: 12px; display: flex; justify-content: flex-end;" id="delete-wh-section"></div>
 </div>
 
-<div style="margin: 20px 0;">
-<input type="text" id="search" style="border: 2px solid var(--primary);" placeholder="🔍 Global suchen..." onkeyup="render()">
+<div style="margin: 25px 0;">
+<input type="text" id="search" style="border: 1px solid var(--primary); background: #121217;" placeholder="🔍 Global suchen..." onkeyup="render()">
 </div>
 
 <div id="inventory-list"></div>
 </div>
 
-<div id="saveModal" class="modal">
-<div class="modal-content">
-<h3 style="color:var(--success); margin-top:0;">📍 Ziel-Lager</h3>
-<select id="select-target-wh"></select>
-<button class="btn-modal" style="background:var(--success); color:white;" onclick="confirmSaveItem()">Einlagern</button>
-<button class="btn-modal" style="background:#444; color:white;" onclick="closeModal('saveModal')">Abbrechen</button>
-</div>
-</div>
-
-<div id="shoppingModal" class="modal">
-<div class="modal-content">
-<h3 style="color:var(--primary); margin-top:0;">🛒 Bestellliste</h3>
-<div id="shopping-list-content" style="text-align: left;"></div>
-<button class="btn-modal" style="background:var(--primary); color:white;" onclick="closeModal('shoppingModal')">Schließen</button>
-</div>
-</div>
-
-<div id="moveModal" class="modal">
-<div class="modal-content">
-<h3>✈️ Umlagern</h3>
-<p id="move-info" style="color:#aaa;"></p>
-<select id="move-target-wh"></select>
-<input type="number" id="move-qty" value="1" style="margin: 10px 0;">
-<button class="btn-modal" style="background:var(--success); color:white;" onclick="executeMove()">Verschieben</button>
-<button class="btn-modal" style="background:#444; color:white;" onclick="closeModal('moveModal')">Abbrechen</button>
-</div>
-</div>
+<div id="saveModal" class="modal"><div class="modal-content"><h3>📍 Ziel-Lager wählen</h3><select id="select-target-wh"></select><button class="btn-modal" style="background:var(--success); color:white;" onclick="confirmSaveItem()">Einlagern</button><button class="btn-modal" style="background:#444; color:white;" onclick="closeModal('saveModal')">Abbrechen</button></div></div>
+<div id="shoppingModal" class="modal"><div class="modal-content"><h3>🛒 Bestellliste</h3><div id="shopping-list-content" style="text-align: left; max-height: 300px; overflow-y: auto; margin: 15px 0;"></div><button class="btn-modal" style="background:var(--primary); color:white;" onclick="closeModal('shoppingModal')">Schließen</button></div></div>
+<div id="moveModal" class="modal"><div class="modal-content"><h3>✈️ Umlagern</h3><p id="move-info" style="color:#aaa; font-size:13px;"></p><select id="move-target-wh"></select><input type="number" id="move-qty" value="1" style="margin: 10px 0;"><button class="btn-modal" style="background:var(--success); color:white;" onclick="executeMove()">Verschieben</button><button class="btn-modal" style="background:#444; color:white;" onclick="closeModal('moveModal')">Abbrechen</button></div></div>
 
 <script>
 let db = JSON.parse(localStorage.getItem('d3d_storage_v6')) || { "Hauptlager": { color: "#007bff", items: [] } };
@@ -149,7 +139,14 @@ closeModal('saveModal'); save();
 
 function deleteCurrentWarehouse() {
 if (Object.keys(db).length <= 1) return alert("Letztes Lager kann nicht gelöscht werden.");
-if (confirm(`Lager "${currentWH}" wirklich löschen?`)) { delete db[currentWH]; currentWH = Object.keys(db)[0]; save(); }
+if (confirm(`Lager "${currentWH}" wirklich unwiderruflich löschen?`)) { delete db[currentWH]; currentWH = Object.keys(db)[0]; save(); }
+}
+
+function deleteItem(wh, idx) {
+if (confirm(`Artikel "${db[wh].items[idx].name}" wirklich komplett löschen?`)) {
+db[wh].items.splice(idx, 1);
+save();
+}
 }
 
 function handleQty(wh, idx, isPlus) {
@@ -157,7 +154,7 @@ const input = document.getElementById(`qty-input-${wh}-${idx}`);
 const change = parseInt(input.value) || 1;
 let item = db[wh].items[idx];
 item.stock = isPlus ? item.stock + change : Math.max(0, item.stock - change);
-input.value = ''; save();
+save();
 }
 
 function render() {
@@ -189,12 +186,16 @@ else if (item.stock <= item.min * 1.5) barColor = 'var(--warning)';
 
 const div = document.createElement('div');
 div.className = `inventory-item`;
-div.style.borderLeft = `5px solid ${item.stock <= item.min ? 'var(--danger)' : '#444'}`;
+div.style.borderLeft = `4px solid ${item.stock <= item.min ? 'var(--danger)' : '#444'}`;
 div.innerHTML = `
-<div style="display:flex; justify-content:space-between; align-items:center;">
-<div><strong>${item.name}</strong><br><small style="color:#888;">${wh} | ${item.price.toFixed(2)}€</small></div>
-<div class="min-box"><span style="font-size:10px; color:#888;">MIN:</span>
-<input type="number" class="min-input" value="${item.min}" onchange="db['${wh}'].items[${idx}].min=parseInt(this.value);save();"></div>
+<div style="display:flex; justify-content:space-between; align-items:flex-start;">
+<div>
+<strong style="font-size:16px;">${item.name}</strong><br>
+<small style="color:#888;">${wh} | ${item.price.toFixed(2)}€</small>
+</div>
+<div style="text-align:right;">
+<span style="font-size:10px; color:#aaa; font-weight:bold;">MIN: ${item.min}</span>
+</div>
 </div>
 
 <div class="stock-container">
@@ -204,9 +205,10 @@ div.innerHTML = `
 
 <div class="item-controls">
 <button class="btn-action" style="background:var(--primary)" onclick="handleQty('${wh}', ${idx}, true)">+</button>
-<input type="number" id="qty-input-${wh}-${idx}" class="qty-input-field" value="1" style="text-align:center; background:#111; color:white; border:1px solid #444; border-radius:8px;">
+<input type="number" id="qty-input-${wh}-${idx}" class="qty-input-field" value="1">
 <button class="btn-action" style="background:var(--danger)" onclick="handleQty('${wh}', ${idx}, false)">-</button>
-<button class="btn-action" style="background:#555" onclick="openMove('${wh}', ${idx})">✈️</button>
+<button class="btn-action" style="background:#444" onclick="openMove('${wh}', ${idx})">✈️</button>
+<button class="btn-action btn-delete-item" onclick="deleteItem('${wh}', ${idx})">✕</button>
 </div>
 `;
 list.appendChild(div);
@@ -225,14 +227,22 @@ function openShoppingList() {
 const content = document.getElementById('shopping-list-content');
 content.innerHTML = '';
 Object.keys(db).forEach(wh => db[wh].items.forEach(i => {
-if(i.stock <= i.min) content.innerHTML += `<div style="background:#311; padding:10px; border-radius:8px; margin-bottom:5px; border-left:4px solid var(--danger)"><strong>${i.name}</strong> (${wh})</div>`;
+if(i.stock <= i.min) {
+const diff = i.min - i.stock;
+content.innerHTML += `<div style="background:#2d1a1a; padding:12px; border-radius:10px; margin-bottom:8px; border-left:4px solid var(--danger); display:flex; justify-content:space-between; align-items:center;">
+<div><strong>${i.name}</strong><br><small>${wh}</small></div>
+<div style="color:var(--danger); font-weight:bold;">+ ${diff > 0 ? diff : 1} Stk.</div>
+</div>`;
+}
 }));
-if(!content.innerHTML) content.innerHTML = "<p style='text-align:center; color:#888;'>Alles auf Vorrat!</p>";
+if(!content.innerHTML) content.innerHTML = "<p style='text-align:center; color:#888; margin: 20px 0;'>Alles im grünen Bereich!</p>";
 document.getElementById('shoppingModal').style.display = 'block';
 }
 
 function openMove(wh, idx) {
 moveTargetData = { itemIdx: idx, fromWH: wh };
+const item = db[wh].items[idx];
+document.getElementById('move-info').innerText = `${item.name} von ${wh} verschieben:`;
 const select = document.getElementById('move-target-wh');
 select.innerHTML = '';
 Object.keys(db).forEach(name => { if(name !== wh) select.options.add(new Option(name, name)); });
@@ -248,6 +258,8 @@ item.stock -= qty;
 let existing = db[target].items.find(i => i.name === item.name);
 if(existing) existing.stock += qty; else db[target].items.push({...item, stock: qty});
 closeModal('moveModal'); save();
+} else {
+alert("Nicht genügend Bestand oder ungültige Anzahl!");
 }
 }
 
