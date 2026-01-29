@@ -3,97 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lager-Manager Projekt-Elite</title>
+    <title>Lager-Manager Pro Elite</title>
     <style>
         :root { --primary: #007bff; --success: #28a745; --danger: #ff4444; --warning: #ffbb33; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; }
         body { font-family: -apple-system, sans-serif; padding: 10px; background: var(--bg); color: var(--text); line-height: 1.4; margin: 0; padding-bottom: 50px; }
+        
         .card { background: var(--card); padding: 15px; border-radius: 12px; max-width: 600px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
         h2 { color: var(--success); text-align: center; text-transform: uppercase; margin-bottom: 15px; }
+        
         .section { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333; }
         h3 { font-size: 13px; margin: 0 0 10px 0; color: #00d4ff; text-transform: uppercase; border-bottom: 1px solid #444; padding-bottom: 5px; }
+
         label { display: block; margin-top: 8px; font-size: 10px; color: #888; text-transform: uppercase; }
         input, select { width: 100%; padding: 12px; margin-top: 4px; border: 1px solid #444; border-radius: 6px; background: #121212; color: white; font-size: 16px; box-sizing: border-box; }
+        
+        /* Lager-Tabs mit Farbindikator */
         .warehouse-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none; align-items: center; }
         .warehouse-tab { background: #333; padding: 8px 16px; border-radius: 20px; white-space: nowrap; cursor: pointer; font-size: 13px; border: 2px solid transparent; display: flex; align-items: center; gap: 6px; }
         .warehouse-tab.active { background: var(--primary); font-weight: bold; border-color: white; }
         .color-dot { width: 10px; height: 10px; border-radius: 50%; border: 1px solid #fff; }
-        .category-header { background: #333; padding: 8px 12px; border-radius: 6px; margin: 20px 0 10px 0; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #00d4ff; }
-        .inventory-item { background: #2a2a2a; margin-bottom: 8px; padding: 12px; border-radius: 8px; border-left: 4px solid #444; }
-        .low-stock { border-left-color: var(--danger) !important; background: #3a1a1a; }
-        .stock-bar-container { width: 100%; height: 6px; background: #111; border-radius: 3px; margin: 8px 0; overflow: hidden; }
-        .stock-bar { height: 100%; transition: 0.3s; }
-        .item-controls { display: grid; grid-template-columns: 1fr 1fr 1fr 0.5fr; gap: 5px; margin-top: 10px; }
-        .btn-action { height: 38px; font-size: 18px; color: white; border: none; border-radius: 6px; cursor: pointer; }
+
+        /* Projekt Gruppierung */
+        .project-group { margin-bottom: 20px; border: 1px solid #333; border-radius: 10px; overflow: hidden; }
+        .project-header { background: #2a2a2a; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .project-header strong { color: #00d4ff; }
+
+        /* Artikel Karte */
+        .inventory-item { background: #1e1e1e; padding: 15px; border-bottom: 1px solid #333; border-left: 5px solid transparent; }
+        .low-stock { border-left-color: var(--danger) !important; background: #2a1515; }
+        
+        /* Fortschrittsbalken */
+        .stock-bar-container { width: 100%; height: 10px; background: #111; border-radius: 5px; margin: 10px 0; overflow: hidden; border: 1px solid #333; }
+        .stock-bar { height: 100%; transition: 0.4s ease-out; }
+
+        .item-controls { display: grid; grid-template-columns: 1fr 1.2fr 1fr 0.6fr; gap: 8px; margin-top: 15px; }
+        .btn-action { height: 48px; font-size: 22px; color: white; border: none; border-radius: 8px; cursor: pointer; }
+
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; }
         .modal-content { background: var(--card); margin: 10% auto; padding: 25px; border-radius: 15px; width: 85%; max-width: 450px; border: 1px solid var(--primary); }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>📦 Lager Projekt Pro</h2>
+<div class="card" id="main-container">
+    <h2 id="app-title">📦 Lager-Manager Pro</h2>
 
     <div class="warehouse-nav" id="warehouse-tabs"></div>
     
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
-        <button onclick="openShoppingList()" style="background:var(--primary); color:white; padding:12px; border-radius:8px;">🛒 Bedarf <span id="low-count-badge" style="background:var(--danger); padding:1px 6px; border-radius:8px;">0</span></button>
-        <button onclick="openFillMode()" style="background:#444; color:white; padding:12px; border-radius:8px;">🚚 Auffüllen</button>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+        <button onclick="openShoppingList()" style="background:var(--primary); color:white; padding:14px; border-radius:10px;">🛒 Einkaufsliste <span id="low-count-badge" style="background:var(--danger); padding:2px 8px; border-radius:10px;">0</span></button>
+        <button onclick="openExport()" style="background:#444; color:white; padding:14px; border-radius:10px;">💾 Backup</button>
     </div>
 
     <div class="section">
         <h3>🏠 Artikel / Projekt anlegen</h3>
-        <input type="text" id="name" placeholder="Bezeichnung (z.B. 1-fach Rahmen)">
-        <input type="text" id="category" placeholder="Projekt/Kategorie (z.B. Münchner Str. 1)">
+        <input type="text" id="name" placeholder="Bezeichnung (z.B. Rauchmelder)">
+        <input type="text" id="category" placeholder="Projekt/Tag (z.B. Baustelle Süd)">
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-            <div><label>€</label><input type="number" id="price" step="0.01" placeholder="0"></div>
+            <div><label>Preis €</label><input type="number" id="price" step="0.01" placeholder="0.00"></div>
             <div><label>Bestand</label><input type="number" id="stock" placeholder="0"></div>
             <div><label>Min</label><input type="number" id="min" placeholder="5"></div>
         </div>
-        <button onclick="preSaveItem()" style="background:var(--success); color:white; width:100%; padding:12px; margin-top:10px; border-radius:8px;">💾 Im Lager speichern</button>
+        <button onclick="preSaveItem()" style="background:var(--success); color:white; width:100%; padding:14px; margin-top:15px; border-radius:10px;">💾 Artikel einlagern</button>
     </div>
 
-    <input type="text" id="search" style="border: 2px solid var(--primary); margin-bottom: 15px;" placeholder="🔍 Suchen nach Artikel oder Projekt..." onkeyup="render()">
-    <div id="inventory-list"></div>
-
-    <div class="section" style="margin-top: 20px;">
-        <h3>⚙️ Einstellungen</h3>
-        <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 5px;">
-            <input type="text" id="new-wh-name" placeholder="Lagername...">
-            <input type="color" id="new-wh-color" value="#007bff" style="width:40px; height:40px;">
-            <button onclick="addWarehouse()" style="background:var(--primary); color:white; padding:0 15px; border-radius:6px;">+</button>
+    <div class="section">
+        <h3>⚙️ Neues Lager</h3>
+        <div style="display: flex; gap: 8px;">
+            <input type="text" id="new-wh-name" placeholder="Name...">
+            <input type="color" id="new-wh-color" value="#007bff" style="width:60px; height:45px; padding:2px;">
+            <button onclick="addWarehouse()" style="background:var(--primary); color:white; padding:0 15px; border-radius:8px;">+</button>
         </div>
-        <button onclick="exportData()" style="width:100%; margin-top:10px; background:#333; color:#aaa; border:none; padding:5px; font-size:10px;">Daten Backup</button>
-        <button onclick="deleteCurrentWarehouse()" style="width:100%; margin-top:5px; background:#211; color:var(--danger); border:none; padding:5px; font-size:10px;">Lager "${currentWH}" löschen</button>
+    </div>
+
+    <input type="text" id="search" style="border: 2px solid var(--primary); margin-bottom: 15px;" placeholder="🔍 Suchen..." onkeyup="render()">
+    <div id="inventory-list"></div>
+</div>
+
+<div id="saveModal" class="modal">
+    <div class="modal-content">
+        <h3>📍 Ziel-Lager wählen</h3>
+        <select id="select-target-wh" style="margin: 15px 0;"></select>
+        <button onclick="confirmSaveItem()" style="background:var(--success); color:white; width:100%; padding:15px; border-radius:10px;">Speichern</button>
+        <button onclick="closeModal('saveModal')" style="background:none; color:white; margin-top:10px; width:100%;">Abbrechen</button>
     </div>
 </div>
 
 <div id="moveProjectModal" class="modal">
     <div class="modal-content">
-        <h3 id="move-project-title">Projekt umbuchen</h3>
-        <p style="font-size:12px; color:#888;">Verschiebt alle Artikel dieses Projekts in ein anderes Lager.</p>
-        <label>Ziel-Lager:</label>
-        <select id="move-project-target" style="margin-bottom:15px;"></select>
-        <button onclick="executeProjectMove()" style="background:var(--success); color:white; width:100%; padding:15px; border-radius:10px;">🚀 Jetzt umbuchen</button>
+        <h3 id="move-proj-title">Projekt umbuchen</h3>
+        <label>Verschieben nach:</label>
+        <select id="move-proj-target" style="margin-bottom:15px;"></select>
+        <button onclick="executeProjectMove()" style="background:var(--success); color:white; width:100%; padding:15px; border-radius:10px;">Projekt jetzt verschieben</button>
         <button onclick="closeModal('moveProjectModal')" style="background:none; color:white; margin-top:10px; width:100%;">Abbrechen</button>
     </div>
 </div>
 
-<div id="shoppingModal" class="modal"><div class="modal-content"><h3>🛒 Globaler Bedarf</h3><div id="shopping-list-content"></div><button onclick="closeModal('shoppingModal')" style="background:var(--primary); color:white; width:100%; padding:15px; margin-top:15px; border-radius:10px;">Schließen</button></div></div>
-<div id="fillModal" class="modal"><div class="modal-content"><h3 id="fill-title">🚚 Auffüllen</h3><div id="fill-list-content"></div><button onclick="closeModal('fillModal')" style="background:var(--primary); color:white; width:100%; padding:15px; margin-top:15px; border-radius:10px;">Fertig</button></div></div>
-<div id="saveModal" class="modal"><div class="modal-content"><h3>📍 Einlagern in...</h3><select id="select-target-wh" style="margin: 15px 0;"></select><button onclick="confirmSaveItem()" style="background:var(--success); color:white; width:100%; padding:15px; border-radius:10px;">Einlagern</button><button onclick="closeModal('saveModal')" style="background:none; color:white; margin-top:10px; width:100%;">Abbrechen</button></div></div>
-
 <script>
-    let db = JSON.parse(localStorage.getItem('d3d_storage_v6')) || { "Hauptlager": { color: "#007bff", items: [] } };
+    let db = JSON.parse(localStorage.getItem('d3d_storage_v7')) || { 
+        "Hauptlager": { color: "#007bff", items: [] } 
+    };
     let currentWH = Object.keys(db)[0];
     let tempItem = null;
-    let projectToMove = "";
+    let selectedProject = "";
 
-    function save() { localStorage.setItem('d3d_storage_v6', JSON.stringify(db)); render(); }
+    function save() { 
+        localStorage.setItem('d3d_storage_v7', JSON.stringify(db)); 
+        render(); 
+    }
 
     function addWarehouse() {
         const name = document.getElementById('new-wh-name').value.trim();
         const color = document.getElementById('new-wh-color').value;
-        if(name && !db[name]) { db[name] = { color: color, items: [] }; currentWH = name; save(); }
+        if(name && !db[name]) { 
+            db[name] = { color: color, items: [] }; 
+            currentWH = name; 
+            document.getElementById('new-wh-name').value = ''; 
+            save(); 
+        }
     }
 
     function preSaveItem() {
@@ -113,12 +140,18 @@
     }
 
     function confirmSaveItem() {
-        db[document.getElementById('select-target-wh').value].items.push(tempItem);
+        const target = document.getElementById('select-target-wh').value;
+        db[target].items.push(tempItem);
         ["name", "category", "price", "stock", "min"].forEach(id => document.getElementById(id).value = '');
-        closeModal('saveModal'); save();
+        closeModal('saveModal');
+        currentWH = target;
+        save();
     }
 
     function render() {
+        // Hintergrundfarbe des Containers leicht anpassen an Lagerfarbe
+        document.getElementById('main-container').style.borderTop = `5px solid ${db[currentWH].color}`;
+        
         const tabs = document.getElementById('warehouse-tabs');
         tabs.innerHTML = '';
         Object.keys(db).forEach(wh => {
@@ -133,7 +166,7 @@
         const searchTerm = document.getElementById('search').value.toLowerCase();
         list.innerHTML = '';
 
-        // Gruppierung nach Kategorie/Projekt
+        // Gruppieren
         const grouped = {};
         db[currentWH].items.forEach((item, idx) => {
             if(searchTerm && !item.name.toLowerCase().includes(searchTerm) && !item.category.toLowerCase().includes(searchTerm)) return;
@@ -142,84 +175,83 @@
         });
 
         Object.keys(grouped).forEach(cat => {
-            const catDiv = document.createElement('div');
-            catDiv.innerHTML = `
-                <div class="category-header">
-                    <strong>📂 ${cat}</strong>
-                    <button onclick="openProjectMove('${cat}')" style="background:var(--primary); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:10px;">Verschieben ✈️</button>
-                </div>
-            `;
-            list.appendChild(catDiv);
-
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'project-group';
+            
+            let header = `<div class="project-header">
+                <strong>📂 ${cat}</strong>
+                <button onclick="openMoveProject('${cat}')" style="background:#444; color:white; padding:4px 8px; border-radius:5px; font-size:10px;">Umbuchen ✈️</button>
+            </div>`;
+            
+            let itemsHtml = '';
             grouped[cat].forEach(item => {
+                const isCrit = item.stock <= item.min;
+                // Balken Logik
                 const ratio = item.min > 0 ? (item.stock / (item.min * 2)) * 100 : 100;
-                let barColor = item.stock <= item.min ? "var(--danger)" : (item.stock <= item.min * 1.5 ? "var(--warning)" : "var(--success)");
-                
-                const itemDiv = document.createElement('div');
-                itemDiv.className = `inventory-item ${item.stock <= item.min ? 'low-stock' : ''}`;
-                itemDiv.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <strong>${item.name}</strong>
-                        <small style="color:#888;">Min: ${item.min}</small>
-                    </div>
-                    <div class="stock-bar-container"><div class="stock-bar" style="width:${Math.min(100, ratio)}%; background:${barColor}"></div></div>
-                    <div style="font-weight:bold;">Bestand: ${item.stock}</div>
-                    <div class="item-controls">
-                        <button class="btn-action" style="background:var(--success)" onclick="changeQty(${item.originalIdx}, 1)">+</button>
-                        <button class="btn-action" style="background:var(--danger)" onclick="changeQty(${item.originalIdx}, -1)">-</button>
-                        <button class="btn-action" style="background:#444" onclick="deleteItem(${item.originalIdx})">🗑️</button>
-                    </div>
-                `;
-                list.appendChild(itemDiv);
+                let barColor = "var(--success)"; // Grün
+                if(item.stock <= item.min) barColor = "var(--danger)"; // Rot
+                else if(item.stock <= item.min * 1.5) barColor = "var(--warning)"; // Gelb
+
+                itemsHtml += `
+                    <div class="inventory-item ${isCrit ? 'low-stock' : ''}">
+                        <div style="display:flex; justify-content:space-between;">
+                            <strong>${item.name}</strong>
+                            <small style="color:#888;">Min: ${item.min}</small>
+                        </div>
+                        <div class="stock-bar-container">
+                            <div class="stock-bar" style="width:${Math.min(100, ratio)}%; background:${barColor}"></div>
+                        </div>
+                        <div style="font-size:18px; font-weight:bold;">Bestand: ${item.stock}</div>
+                        <div class="item-controls">
+                            <button class="btn-action" style="background:var(--success)" onclick="updateQty(${item.originalIdx}, 1)">+</button>
+                            <input type="number" id="input-${item.originalIdx}" style="text-align:center; background:#111; color:white; border:none;" placeholder="1">
+                            <button class="btn-action" style="background:var(--danger)" onclick="updateQty(${item.originalIdx}, -1)">-</button>
+                            <button class="btn-action" style="background:#333" onclick="deleteItem(${item.originalIdx})">🗑️</button>
+                        </div>
+                    </div>`;
             });
+            
+            groupDiv.innerHTML = header + itemsHtml;
+            list.appendChild(groupDiv);
         });
         updateBadge();
     }
 
-    function openProjectMove(cat) {
-        projectToMove = cat;
-        document.getElementById('move-project-title').innerText = `🚀 "${cat}" umbuchen`;
-        const select = document.getElementById('move-project-target');
+    function updateQty(idx, dir) {
+        const val = parseInt(document.getElementById(`input-${idx}`).value) || 1;
+        db[currentWH].items[idx].stock = Math.max(0, db[currentWH].items[idx].stock + (val * dir));
+        save();
+    }
+
+    function openMoveProject(cat) {
+        selectedProject = cat;
+        document.getElementById('move-proj-title').innerText = `🚀 "${cat}" umbuchen`;
+        const select = document.getElementById('move-proj-target');
         select.innerHTML = '';
         Object.keys(db).forEach(wh => { if(wh !== currentWH) select.options.add(new Option(wh, wh)); });
         document.getElementById('moveProjectModal').style.display = 'block';
     }
 
     function executeProjectMove() {
-        const targetWH = document.getElementById('move-project-target').value;
-        if(!targetWH) return alert("Kein Ziel gewählt!");
+        const target = document.getElementById('move-proj-target').value;
+        if(!target) return alert("Kein Ziel gewählt!");
         
-        // Alle Artikel dieses Projekts finden
-        const itemsToMove = db[currentWH].items.filter(i => i.category === projectToMove);
-        
-        itemsToMove.forEach(moveItem => {
-            let existing = db[targetWH].items.find(i => i.name === moveItem.name && i.category === moveItem.category);
-            if(existing) {
-                existing.stock += moveItem.stock;
-            } else {
-                db[targetWH].items.push({...moveItem});
-            }
-        });
-
-        // Aus altem Lager löschen
-        db[currentWH].items = db[currentWH].items.filter(i => i.category !== projectToMove);
+        const toMove = db[currentWH].items.filter(i => i.category === selectedProject);
+        db[target].items.push(...toMove);
+        db[currentWH].items = db[currentWH].items.filter(i => i.category !== selectedProject);
         
         closeModal('moveProjectModal');
         save();
     }
 
-    function changeQty(idx, delta) { db[currentWH].items[idx].stock = Math.max(0, db[currentWH].items[idx].stock + delta); save(); }
     function deleteItem(idx) { if(confirm("Löschen?")) { db[currentWH].items.splice(idx, 1); save(); } }
-    function deleteCurrentWarehouse() { if(confirm("Lager löschen?")) { delete db[currentWH]; currentWH = Object.keys(db)[0]; save(); } }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     function updateBadge() {
-        let lowSet = new Set();
-        Object.keys(db).forEach(wh => db[wh].items.forEach(i => { if(i.stock <= i.min) lowSet.add(i.name); }));
-        document.getElementById('low-count-badge').innerText = lowSet.size;
+        let count = 0;
+        Object.keys(db).forEach(wh => db[wh].items.forEach(i => { if(i.stock <= i.min) count++; }));
+        document.getElementById('low-count-badge').innerText = count;
     }
-    function openShoppingList() { /* Analog zu vorigem Code */ }
-    function openFillMode() { /* Analog zu vorigem Code */ }
-    function exportData() { prompt("Backup Code:", btoa(JSON.stringify(db))); }
+    function openExport() { prompt("Backup-Code (Kopieren & Sichern):", btoa(JSON.stringify(db))); }
     
     window.onload = render;
 </script>
